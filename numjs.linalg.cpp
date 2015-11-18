@@ -29,7 +29,6 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
 		Nan::ThrowTypeError("Wrong number of arguments");
 		return;
 	}
-
     if (!info[0]->IsUint32() || !info[1]->IsUint32() ||
     	!info[3]->IsUint32() || !info[4]->IsUint32()) {
     	Nan::ThrowTypeError("Wrong arguments");
@@ -39,18 +38,15 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
 	if (info[2]->IsNumber()) {
 	    double leftParam(info[2]->NumberValue());
 
-	    if(!info[5]->IsNumber()){
-            Local<Object> rightBuffer = info[5].As<Object>();
-
-            if (rightBuffer->HasIndexedPropertiesInExternalArrayData()) {
-                double *refRightData = static_cast<double*>(rightBuffer->GetIndexedPropertiesExternalArrayData());
+	    if(!info[5]->IsNumber()){          
+			if (info[5]->IsFloat64Array()) {
+				double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
                 size_t rowsRight(info[3]->Uint32Value());
                 size_t colsRight(info[4]->Uint32Value());
                 CMd rightMat(refRightData, rowsRight, colsRight);
 
-                Local<Object> resBuffer = info[6].As<Object>();
-                if (resBuffer->HasIndexedPropertiesInExternalArrayData()) {
-                    double *refResData = static_cast<double*>(resBuffer->GetIndexedPropertiesExternalArrayData());
+				if (info[6]->IsFloat64Array()) {
+					double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
                     Md res(refResData, rowsRight, colsRight);
                     res = leftParam * rightMat;
 
@@ -61,18 +57,17 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
         }
     }
 	else{
-	    Local<Object> leftBuffer = info[2].As<Object>();
-	    if (leftBuffer->HasIndexedPropertiesInExternalArrayData()) {
-	        double *refLeftData = static_cast<double*>(leftBuffer->GetIndexedPropertiesExternalArrayData());
+		if (info[2]->IsFloat64Array()) {
+			double *refLeftData = *(Nan::TypedArrayContents<double>(info[2])); 
 	        size_t rowsLeft(info[0]->Uint32Value());
             size_t colsLeft(info[1]->Uint32Value());
             CMd leftMat(refLeftData, rowsLeft, colsLeft);
 
             if(info[5]->IsNumber()){
                 double rightParam(info[5]->NumberValue());
-                Local<Object> resBuffer = info[6].As<Object>();
-                if (resBuffer->HasIndexedPropertiesInExternalArrayData()) {
-                    double *refResData = static_cast<double*>(resBuffer->GetIndexedPropertiesExternalArrayData());
+                
+				if (info[6]->IsFloat64Array()) {
+					double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
                     Md res(refResData, rowsLeft, colsLeft);
                     res = leftMat * rightParam;
                     Local<Boolean> b = Nan::New(true);
@@ -80,16 +75,16 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
                 }
             }
             else{
-                Local<Object> rightBuffer = info[5].As<Object>();
-                if (rightBuffer->HasIndexedPropertiesInExternalArrayData()) {
-                    double *refRightData = static_cast<double*>(rightBuffer->GetIndexedPropertiesExternalArrayData());
+                //Local<Object> rightBuffer = info[5].As<Object>();
+				if (info[5]->IsFloat64Array()) {
+					double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
                 	size_t rowsRight(info[3]->Uint32Value());
                     size_t colsRight(info[4]->Uint32Value());
                     CMd rightMat(refRightData, rowsRight, colsRight);
 
-                    Local<Object> resBuffer = info[6].As<Object>();
-                    if (resBuffer->HasIndexedPropertiesInExternalArrayData()) {
-                        double *refResData = static_cast<double*>(resBuffer->GetIndexedPropertiesExternalArrayData());
+                    //Local<Object> resBuffer = info[6].As<Object>();
+					if (info[6]->IsFloat64Array()) {
+						double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
                         Md res(refResData, rowsLeft, colsRight);
                          res = leftMat * rightMat;
                         Local<Boolean> b = Nan::New(true);
@@ -136,17 +131,16 @@ void MatrixPower(const Nan::FunctionCallbackInfo<v8::Value>& info){
         return;
     }
 
-    Local<Object> matrixBuffer = info[0].As<Object>();
-    if (matrixBuffer->HasIndexedPropertiesInExternalArrayData()) {
-        double *refMatrixData = static_cast<double*>(matrixBuffer->GetIndexedPropertiesExternalArrayData());
+    
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
         size_t rowsMatrix(info[1]->Uint32Value());
         size_t colsMatrix(info[2]->Uint32Value());
         double expParam(info[3]->NumberValue());
         Md inputMat(refMatrixData, rowsMatrix, colsMatrix);
 
-        Local<Object> resBuffer = info[4].As<Object>();
-        if (resBuffer->HasIndexedPropertiesInExternalArrayData()) {
-            double *refResData = static_cast<double*>(resBuffer->GetIndexedPropertiesExternalArrayData());
+		if (info[4]->IsFloat64Array()) {
+			double *refResData = *(Nan::TypedArrayContents<double>(info[4]));
             Md res(refResData, rowsMatrix, colsMatrix);
 
             if(expParam == 0){
@@ -206,17 +200,15 @@ void Inverse(const Nan::FunctionCallbackInfo<v8::Value>& info){
         return;
     }
 
-    Local<Object> matrixBuffer = info[0].As<Object>();
-    if (matrixBuffer->HasIndexedPropertiesInExternalArrayData()) {
-        double *refMatrixData = static_cast<double*>(matrixBuffer->GetIndexedPropertiesExternalArrayData());
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
         size_t rowsMatrix(info[1]->Uint32Value());
         size_t colsMatrix(info[2]->Uint32Value());
 
         Md inputMat(refMatrixData, rowsMatrix, colsMatrix);
 
-        Local<Object> resBuffer = info[4].As<Object>();
-        if (resBuffer->HasIndexedPropertiesInExternalArrayData()) {
-            double *refResData = static_cast<double*>(resBuffer->GetIndexedPropertiesExternalArrayData());
+		if (info[4]->IsFloat64Array()) {
+			double *refResData = *(Nan::TypedArrayContents<double>(info[4]));
             Md res(refResData, rowsMatrix, colsMatrix);
             res = inputMat.inverse();
             Local<Boolean> b = Nan::New(true);
@@ -261,9 +253,8 @@ void Det(const Nan::FunctionCallbackInfo<v8::Value>& info){
         return;
     }
 
-    Local<Object> matrixBuffer = info[0].As<Object>();
-    if (matrixBuffer->HasIndexedPropertiesInExternalArrayData()) {
-        double *refMatrixData = static_cast<double*>(matrixBuffer->GetIndexedPropertiesExternalArrayData());
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
         size_t rowsMatrix(info[1]->Uint32Value());
         size_t colsMatrix(info[2]->Uint32Value());
 
@@ -308,9 +299,8 @@ void Rank(const Nan::FunctionCallbackInfo<v8::Value>& info){
         return;
     }
 
-    Local<Object> matrixBuffer = info[0].As<Object>();
-    if (matrixBuffer->HasIndexedPropertiesInExternalArrayData()) {
-        double *refMatrixData = static_cast<double*>(matrixBuffer->GetIndexedPropertiesExternalArrayData());
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
         size_t rowsMatrix(info[1]->Uint32Value());
         size_t colsMatrix(info[2]->Uint32Value());
 

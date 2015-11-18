@@ -1,10 +1,9 @@
 var linalg = require('./build/Release/numjs.linalg');
-var smalloc = require('smalloc');
 
 function Matrix(array, rows, cols){
     this.rows = rows;
     this.cols = cols;
-    this.data = smalloc.alloc(rows*cols, smalloc.Types.Double);
+    this.data = new Float64Array(rows*cols);
 
     if(array.length === 0){
         for(var j = 0; j < rows*cols; j++){
@@ -141,3 +140,7 @@ var matrix_rank = function(matrix, tol){
         return linalg.matrix_rank(matrix.data, matrix.rows, matrix.cols);
     }
 };
+var da = new Float64Array([1,0,0,0,1,0,0,0,1]);
+var m = new Matrix(da,3,3);
+var res = det(m);
+console.log("Hey\n" + res);
