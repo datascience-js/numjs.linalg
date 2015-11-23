@@ -1,5 +1,9 @@
 var linalg = require('./build/Release/numjs.linalg');
 
+module.exports = {
+    Matrix : Matrix,
+    matrix_eigen_values : matrix_eigen_values
+};
 function Matrix(array, rows, cols){
     this.rows = rows;
     this.cols = cols;
@@ -141,15 +145,14 @@ var matrix_rank = function(matrix, tol){
     }
 };
 
-var da = new Float64Array([1,2,3,4,5,6,7,8,9]);
-var eigenTestResult = new Float64Array([1,2,3,4,5,6]);
-var m = new Matrix(da,3,3);
-var res = det(m);
-
-linalg.get_eigen_values(3,3 ,da, eigenTestResult);
-
-for (var i = 0; i < 5 ; i+=2) {
-	console.log(eigenTestResult[i] +"+i " + eigenTestResult[i+1]);
-}
-
-console.log("Hey\n" + res);
+function matrix_eigen_values(matrix, tol){
+    if(!matrix || !(matrix instanceof Matrix)){
+        throw new Error("The first arg must be instanceof numjs.Matrix");
+    }
+    if(matrix.rows !== matrix.cols){
+        throw new Error("matrix must be square, i.e. M.rows == M.cols");
+    }
+    var eigenTestResult = new Float64Array(2*matrix.cols);
+    linalg.get_eigen_values(matrix.rows, matrix.cols, matrix.data, eigenTestResult);
+    return eigenTestResult;
+};
