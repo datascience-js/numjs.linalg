@@ -319,17 +319,53 @@ void Rank(const Nan::FunctionCallbackInfo<v8::Value>& info){
         info.GetReturnValue().Set(b);
     }
 }
+
+NAN_METHOD(GetEigenValues){
+	using CMd = Eigen::Map <const Eigen::MatrixXd >;
+	using EMd = Eigen::Map <Eigen::EigenSolver<const Eigen::MatrixXd>::EigenvalueType>;
+
+	if (info.Length() != 4) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+
+	if (!info[0]->IsUint32() || !info[1]->IsUint32()) {
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+	size_t rows1(info[0]->Uint32Value());
+	size_t cols1(info[1]->Uint32Value());
+
+	double *data1 = nullptr;
+	double *resRawData = nullptr;
+
+	if (info[2]->IsFloat64Array() && info[3]->IsFloat64Array()) {
+		data1 = *(Nan::TypedArrayContents<double>(info[2]));
+		resRawData = *(Nan::TypedArrayContents<double>(info[3]));
+	}
+	else{
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+
+	CMd first(data1, rows1, cols1);
+	EMd eigenResults(reinterpret_cast<std::complex<double>*>(resRawData)/*very ugly but well defined afaik */, rows1, 1);
+	Eigen::EigenSolver<Eigen::MatrixXd> eigenSolver(first, false);
+
+	eigenResults = eigenSolver.eigenvalues();
+	Local<Boolean> b = Nan::New(true);
+	info.GetReturnValue().Set(b);
+}
+
+
 void Init(v8::Local<v8::Object> exports) {
-	exports->Set(Nan::New("dot").ToLocalChecked(),
-		Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
-	exports->Set(Nan::New("matrix_power").ToLocalChecked(),
-    		Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
-    exports->Set(Nan::New("inv").ToLocalChecked(),
-        		Nan::New<v8::FunctionTemplate>(Inverse)->GetFunction());
-    exports->Set(Nan::New("det").ToLocalChecked(),
-            		Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
-    exports->Set(Nan::New("matrix_rank").ToLocalChecked(),
-                		Nan::New<v8::FunctionTemplate>(Rank)->GetFunction());
+	exports->Set(Nan::New("dot").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
+	exports->Set(Nan::New("matrix_power").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
+    exports->Set(Nan::New("inv").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Inverse)->GetFunction());
+    exports->Set(Nan::New("det").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
+    exports->Set(Nan::New("matrix_rank").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Rank)->GetFunction());
+	exports->Set(Nan::New("get_eigen_values").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GetEigenValues)->GetFunction());
+
 }
 
 NODE_MODULE(addon, Init)

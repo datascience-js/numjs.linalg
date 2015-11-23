@@ -140,7 +140,16 @@ var matrix_rank = function(matrix, tol){
         return linalg.matrix_rank(matrix.data, matrix.rows, matrix.cols);
     }
 };
-var da = new Float64Array([1,0,0,0,1,0,0,0,1]);
+
+var da = new Float64Array([1,2,3,4,5,6,7,8,9]);
+var eigenTestResult = new Float64Array([1,2,3,4,5,6]);
 var m = new Matrix(da,3,3);
 var res = det(m);
+
+linalg.get_eigen_values(3,3 ,da, eigenTestResult);
+
+for (var i = 0; i < 5 ; i+=2) {
+	console.log(eigenTestResult[i] +"+i " + eigenTestResult[i+1]);
+}
+
 console.log("Hey\n" + res);
