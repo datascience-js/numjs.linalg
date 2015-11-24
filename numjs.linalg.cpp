@@ -397,6 +397,49 @@ NAN_METHOD(SolveLinearSystemHouseholderQr){
 }
 
 
+NAN_METHOD(MatMul){
+	using CMd = Eigen::Map <const Eigen::MatrixXd >;
+	using Md = Eigen::Map <Eigen::MatrixXd >;
+	//Map<MatrixXf> mf(pf, rows, columns);
+
+	if (info.Length() < 7) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+
+	if (!info[0]->IsUint32() || !info[1]->IsUint32() ||/* !args[2]->IsFloat32Array() ||*/
+		!info[3]->IsUint32() || !info[4]->IsUint32()   /*||  !args[5]->IsFloat32Array() ||
+													   !args[6]->IsFloat32Array()*/) {
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+	size_t rows1(info[0]->Uint32Value());
+	size_t cols1(info[1]->Uint32Value());
+
+	if (!info[2]->IsFloat64Array() || !info[5]->IsFloat64Array() || !info[6]->IsFloat64Array()) {
+		Nan::ThrowTypeError("Wrong arguments - expected Float64Array");
+		return;
+	}
+	
+	double *data1 = *(Nan::TypedArrayContents<double>(info[2]));
+	CMd first(data1, rows1, cols1);
+
+	size_t rows2(info[3]->Uint32Value());
+	size_t cols2(info[4]->Uint32Value());
+
+	double *data2 = *(Nan::TypedArrayContents<double>(info[5]));
+
+	CMd second(data2, rows2, cols2);
+
+	double *resRawData = *(Nan::TypedArrayContents<double>(info[6]));
+
+	Md res(resRawData, rows1, cols2);
+	res = first * second;
+	Local<Boolean> b = Nan::New(true);
+	info.GetReturnValue().Set(b);
+}
+
+
 
 void Init(v8::Local<v8::Object> exports) {
 	exports->Set(Nan::New("dot").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
@@ -406,7 +449,7 @@ void Init(v8::Local<v8::Object> exports) {
     exports->Set(Nan::New("matrix_rank").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Rank)->GetFunction());
 	exports->Set(Nan::New("get_eigen_values").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GetEigenValues)->GetFunction());
 	exports->Set(Nan::New("solve_linear_system_householder_qr").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SolveLinearSystemHouseholderQr)->GetFunction());
-
+	exports->Set(Nan::New("mat_mul").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatMul)->GetFunction());
 }
 
 NODE_MODULE(addon, Init)

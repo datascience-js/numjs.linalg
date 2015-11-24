@@ -3,7 +3,8 @@ var linalg = require('./build/Release/numjs.linalg');
 module.exports = {
     Matrix : Matrix,
     matrix_eigen_values : matrix_eigen_values,
-    matrix_solve_linear : matrix_solve_linear
+    matrix_solve_linear : matrix_solve_linear,
+    matrix_mul : matrix_mul
 };
 function Matrix(array, rows, cols){
     this.rows = rows;
@@ -163,10 +164,25 @@ function matrix_solve_linear(matrix, b){
         throw new Error("The first arg must be instanceof numjs.Matrix");
     }
     if(b.length !== matrix.cols){
-        throw new Error("matrix must be square, i.e. M.rows == M.cols");
+        throw new Error("matrix and the parameter dimensions must agree.");
     } 
     //TODO: check matrix rank ?
     var x = new Float64Array(matrix.cols);
     linalg.solve_linear_system_householder_qr(matrix.rows, matrix.cols, matrix.data, b, x);
     return x;    
 };
+
+function matrix_mul(matrixA, matrixB){
+    if(!matrixA || !(matrixA instanceof Matrix) || !matrixB || !(matrixB instanceof Matrix)){
+        throw new Error("The first arg must be instanceof numjs.Matrix");
+    }
+    if(matrixA.cols !== matrixB.rows){
+        throw new Error("matrix and the parameter dimensions must agree, i.e. matrixA.cols == matrixB.rows");
+    } 
+    var res = new Float64Array(matrixA.rows * matrixB.cols);
+    linalg.mat_mul(matrixA.rows, matrixA.cols, matrixA.data, matrixB.rows, matrixB.cols, matrixB.data, res);    
+    return new Matrix(res,matrixA.rows,matrixB.cols);    
+};
+
+
+
