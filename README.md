@@ -9,3 +9,9 @@ $ npm run configure
 $ npm run build
 $ npm test
 ```
+
+Subsequent builds can be just:
+
+```
+$ npm run build
+```
