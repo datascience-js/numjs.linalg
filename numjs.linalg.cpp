@@ -358,6 +358,46 @@ NAN_METHOD(GetEigenValues){
 }
 
 
+NAN_METHOD(SolveLinearSystemHouseholderQr){
+	using CMd = Eigen::Map <const Eigen::MatrixXd >;
+	using Md = Eigen::Map <Eigen::MatrixXd >;
+	using MVd = Eigen::Map < Eigen::VectorXd >;
+
+	if (info.Length() != 5) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+
+	if (!info[0]->IsUint32() || !info[1]->IsUint32()) {
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+	size_t rows1(info[0]->Uint32Value());
+	size_t cols1(info[1]->Uint32Value());
+
+	double *data1 = nullptr;
+
+	if (!info[2]->IsFloat64Array() || !info[3]->IsFloat64Array() || !info[4]->IsFloat64Array()) {
+		Nan::ThrowTypeError("Wrong arguments - expected Float64Array");
+		return;
+	}
+	data1 = *(Nan::TypedArrayContents<double>(info[2]));
+	CMd matrixA(data1, rows1, cols1);	
+	double *parameterData = nullptr;
+	parameterData = *(Nan::TypedArrayContents<double>(info[3]));
+	double *resultVectorData = nullptr;
+	resultVectorData = *(Nan::TypedArrayContents<double>(info[4]));
+	MVd paramVector(parameterData, rows1, 1);
+	MVd resultVector(resultVectorData, rows1, 1);
+	resultVector = matrixA.householderQr().solve(paramVector);
+
+	//TODO: maybe support tolerance and get the required precision: double relative_error = (matrixA*resultVector - paramVector).norm() / paramVector.norm();
+	Local<Boolean> b = Nan::New(true);
+	info.GetReturnValue().Set(b);
+}
+
+
+
 void Init(v8::Local<v8::Object> exports) {
 	exports->Set(Nan::New("dot").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
 	exports->Set(Nan::New("matrix_power").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
@@ -365,6 +405,7 @@ void Init(v8::Local<v8::Object> exports) {
     exports->Set(Nan::New("det").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
     exports->Set(Nan::New("matrix_rank").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Rank)->GetFunction());
 	exports->Set(Nan::New("get_eigen_values").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GetEigenValues)->GetFunction());
+	exports->Set(Nan::New("solve_linear_system_householder_qr").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SolveLinearSystemHouseholderQr)->GetFunction());
 
 }
 
