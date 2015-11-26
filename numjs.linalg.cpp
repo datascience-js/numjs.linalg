@@ -320,17 +320,137 @@ void Rank(const Nan::FunctionCallbackInfo<v8::Value>& info){
         info.GetReturnValue().Set(b);
     }
 }
+
+NAN_METHOD(GetEigenValues){
+	using CMd = Eigen::Map <const Eigen::MatrixXd >;
+	using EMd = Eigen::Map <Eigen::EigenSolver<const Eigen::MatrixXd>::EigenvalueType>;
+
+	if (info.Length() != 4) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+
+	if (!info[0]->IsUint32() || !info[1]->IsUint32()) {
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+	size_t rows1(info[0]->Uint32Value());
+	size_t cols1(info[1]->Uint32Value());
+
+	double *data1 = nullptr;
+	double *resRawData = nullptr;
+
+	if (info[2]->IsFloat64Array() && info[3]->IsFloat64Array()) {
+		data1 = *(Nan::TypedArrayContents<double>(info[2]));
+		resRawData = *(Nan::TypedArrayContents<double>(info[3]));
+	}
+	else{
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+
+	CMd first(data1, rows1, cols1);
+	EMd eigenResults(reinterpret_cast<std::complex<double>*>(resRawData)/*very ugly but well defined afaik */, rows1, 1);
+	Eigen::EigenSolver<Eigen::MatrixXd> eigenSolver(first, false);
+
+	eigenResults = eigenSolver.eigenvalues();
+	Local<Boolean> b = Nan::New(true);
+	info.GetReturnValue().Set(b);
+}
+
+
+NAN_METHOD(SolveLinearSystemHouseholderQr){
+	using CMd = Eigen::Map <const Eigen::MatrixXd >;
+	using Md = Eigen::Map <Eigen::MatrixXd >;
+	using MVd = Eigen::Map < Eigen::VectorXd >;
+
+	if (info.Length() != 5) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+
+	if (!info[0]->IsUint32() || !info[1]->IsUint32()) {
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+	size_t rows1(info[0]->Uint32Value());
+	size_t cols1(info[1]->Uint32Value());
+
+	double *data1 = nullptr;
+
+	if (!info[2]->IsFloat64Array() || !info[3]->IsFloat64Array() || !info[4]->IsFloat64Array()) {
+		Nan::ThrowTypeError("Wrong arguments - expected Float64Array");
+		return;
+	}
+	data1 = *(Nan::TypedArrayContents<double>(info[2]));
+	CMd matrixA(data1, rows1, cols1);	
+	double *parameterData = nullptr;
+	parameterData = *(Nan::TypedArrayContents<double>(info[3]));
+	double *resultVectorData = nullptr;
+	resultVectorData = *(Nan::TypedArrayContents<double>(info[4]));
+	MVd paramVector(parameterData, rows1, 1);
+	MVd resultVector(resultVectorData, rows1, 1);
+	resultVector = matrixA.householderQr().solve(paramVector);
+
+	//TODO: maybe support tolerance and get the required precision: double relative_error = (matrixA*resultVector - paramVector).norm() / paramVector.norm();
+	Local<Boolean> b = Nan::New(true);
+	info.GetReturnValue().Set(b);
+}
+
+
+NAN_METHOD(MatMul){
+	using CMd = Eigen::Map <const Eigen::MatrixXd >;
+	using Md = Eigen::Map <Eigen::MatrixXd >;
+	//Map<MatrixXf> mf(pf, rows, columns);
+
+	if (info.Length() < 7) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+
+	if (!info[0]->IsUint32() || !info[1]->IsUint32() ||/* !args[2]->IsFloat32Array() ||*/
+		!info[3]->IsUint32() || !info[4]->IsUint32()   /*||  !args[5]->IsFloat32Array() ||
+													   !args[6]->IsFloat32Array()*/) {
+		Nan::ThrowTypeError("Wrong arguments");
+		return;
+	}
+	size_t rows1(info[0]->Uint32Value());
+	size_t cols1(info[1]->Uint32Value());
+
+	if (!info[2]->IsFloat64Array() || !info[5]->IsFloat64Array() || !info[6]->IsFloat64Array()) {
+		Nan::ThrowTypeError("Wrong arguments - expected Float64Array");
+		return;
+	}
+	
+	double *data1 = *(Nan::TypedArrayContents<double>(info[2]));
+	CMd first(data1, rows1, cols1);
+
+	size_t rows2(info[3]->Uint32Value());
+	size_t cols2(info[4]->Uint32Value());
+
+	double *data2 = *(Nan::TypedArrayContents<double>(info[5]));
+
+	CMd second(data2, rows2, cols2);
+
+	double *resRawData = *(Nan::TypedArrayContents<double>(info[6]));
+
+	Md res(resRawData, rows1, cols2);
+	res = first * second;
+	Local<Boolean> b = Nan::New(true);
+	info.GetReturnValue().Set(b);
+}
+
+
+
 void Init(v8::Local<v8::Object> exports) {
-	exports->Set(Nan::New("dot").ToLocalChecked(),
-		Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
-	exports->Set(Nan::New("matrix_power").ToLocalChecked(),
-    		Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
-    exports->Set(Nan::New("inv").ToLocalChecked(),
-        		Nan::New<v8::FunctionTemplate>(Inverse)->GetFunction());
-    exports->Set(Nan::New("det").ToLocalChecked(),
-            		Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
-    exports->Set(Nan::New("matrix_rank").ToLocalChecked(),
-                		Nan::New<v8::FunctionTemplate>(Rank)->GetFunction());
+	exports->Set(Nan::New("dot").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
+	exports->Set(Nan::New("matrix_power").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
+    exports->Set(Nan::New("inv").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Inverse)->GetFunction());
+    exports->Set(Nan::New("det").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
+    exports->Set(Nan::New("matrix_rank").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Rank)->GetFunction());
+	exports->Set(Nan::New("get_eigen_values").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GetEigenValues)->GetFunction());
+	exports->Set(Nan::New("solve_linear_system_householder_qr").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SolveLinearSystemHouseholderQr)->GetFunction());
+	exports->Set(Nan::New("mat_mul").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatMul)->GetFunction());
 }
 
 NODE_MODULE(addon, Init)
