@@ -55,6 +55,7 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
                 }
             }
         }
+
     }
 	else{
 		if (info[2]->IsFloat64Array()) {
@@ -207,21 +208,21 @@ void Inverse(const Nan::FunctionCallbackInfo<v8::Value>& info){
 
         Md inputMat(refMatrixData, rowsMatrix, colsMatrix);
 
-		if (info[4]->IsFloat64Array()) {
-			double *refResData = *(Nan::TypedArrayContents<double>(info[4]));
+		if (info[3]->IsFloat64Array()) {
+			double *refResData = *(Nan::TypedArrayContents<double>(info[3]));
             Md res(refResData, rowsMatrix, colsMatrix);
             res = inputMat.inverse();
             Local<Boolean> b = Nan::New(true);
             info.GetReturnValue().Set(b);
         }
         else{
-            Nan::ThrowTypeError("Wrong arguments2");
+            Nan::ThrowTypeError("Wrong arguments (4th arg)");
             Local<Boolean> b = Nan::New(false);
             info.GetReturnValue().Set(b);
         }
     }
     else{
-        Nan::ThrowTypeError("Wrong arguments3");
+        Nan::ThrowTypeError("Wrong arguments (1st arg)");
         Local<Boolean> b = Nan::New(false);
         info.GetReturnValue().Set(b);
     }
