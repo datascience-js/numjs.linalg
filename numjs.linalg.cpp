@@ -228,6 +228,49 @@ void Inverse(const Nan::FunctionCallbackInfo<v8::Value>& info){
     }
 }
 
+
+/**
+  *  Trace:
+  *  Computes The sum along the diagonals of an array
+  *
+  *  arguments:
+  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *  info[1]: Number represent the number of rows of the matrix.
+  *  info[2]: Number represent the number of columns of the matrix.
+  *
+  *  Return value: a Number represent the trace (diagonal sum) of the given matrix.
+*/
+void Trace(const Nan::FunctionCallbackInfo<v8::Value>& info){
+    using CMd = Eigen::Map <const Eigen::MatrixXd >;
+    using Md = Eigen::Map <Eigen::MatrixXd >;
+
+    if (info.Length() < 3) {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
+        Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
+        size_t rowsMatrix(info[1]->Uint32Value());
+        size_t colsMatrix(info[2]->Uint32Value());
+
+        Md inputMat(refMatrixData, rowsMatrix, colsMatrix);
+        v8::Local<v8::Number> num = Nan::New(inputMat.trace());
+        info.GetReturnValue().Set(num);
+    }
+    else{
+        Nan::ThrowTypeError("Wrong arguments");
+        Local<Boolean> b = Nan::New(false);
+        info.GetReturnValue().Set(b);
+    }
+}
+
+
 /**
   *  Det:
   *  Compute the determinant of an array.
@@ -447,6 +490,7 @@ void Init(v8::Local<v8::Object> exports) {
 	exports->Set(Nan::New("matrix_power").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
     exports->Set(Nan::New("inv").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Inverse)->GetFunction());
     exports->Set(Nan::New("det").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
+    exports->Set(Nan::New("trace").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Trace)->GetFunction());
     exports->Set(Nan::New("matrix_rank").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Rank)->GetFunction());
 	exports->Set(Nan::New("get_eigen_values").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(GetEigenValues)->GetFunction());
 	exports->Set(Nan::New("solve_linear_system_householder_qr").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SolveLinearSystemHouseholderQr)->GetFunction());

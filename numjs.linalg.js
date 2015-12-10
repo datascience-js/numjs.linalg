@@ -113,6 +113,14 @@ var numjs_linalg = {
         return out;
     },
 
+    trace: function(matrix) {
+        if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
+            throw new Error("The first arg must be instanceof numjs.Matrix");
+        }
+
+        return linalg.trace(matrix.data, matrix.rows, matrix.cols);
+    },
+
     det: function (matrix) {
         if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
             throw new Error("The first arg must be instanceof numjs.Matrix");

@@ -116,6 +116,44 @@ describe('numjs.linalg - native extension to support linear algebra via the Eige
         })
     })
 
+    describe('trace', function() {
+        it ('should return 2 (regular ones matrix)', function() {
+            var jsMat = new linalg.Matrix([1, 1, 1, 1], 2, 2);
+            var trace = linalg.trace(jsMat);
+            expect(trace).to.equal(2);
+        })
+
+        it ('should return 0 (zeros matrix)', function() {
+            var jsMat = new linalg.Matrix([0,0,0,0], 2, 2);
+            var trace = linalg.trace(jsMat);
+            expect(trace).to.equal(0);
+        })
+
+        it ('should return 14 (3X3 matrix)', function() {
+            var jsMat = new linalg.Matrix([1,2,3,4,5,6,7,8,9], 3, 3);
+            var trace = linalg.trace(jsMat);
+            expect(trace).to.equal(15);
+        })
+
+        it ('should return 3 (3X3 ones matrix)', function() {
+            var jsMat = new linalg.Matrix([1,1,1,1,1,1,1,1,1], 3, 3);
+            var trace = linalg.trace(jsMat);
+            expect(trace).to.equal(3);
+        })
+
+        it ('should return 0 (2X2 reverse numbers test)', function() {
+            var jsMat = new linalg.Matrix([-1, 1, -1, 1], 2, 2);
+            var trace = linalg.trace(jsMat);
+            expect(trace).to.equal(0);
+        })
+
+        it ('should return -2 (2X2 negative numbers test)', function() {
+            var jsMat = new linalg.Matrix([-1, -1, -1, -1], 2, 2);
+            var trace = linalg.trace(jsMat);
+            expect(trace).to.equal(-2);
+        })
+    })
+
     describe('det', function () {
         it('should return 7 (positive determinant)', function () {
             var jsMat = new linalg.Matrix([2, -1, 1, 3], 2, 2);
