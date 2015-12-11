@@ -30,8 +30,7 @@ var numjs_linalg = {
      * usage: var emptyMat = numjs_linalg.empty(3, 3);
      * @param rows - the number of matrix rows
      * @param cols - the number of matrix cols
-     * testing
-     *
+     *test
      */
     empty: function(rows, cols) {
         if (!rows || !cols) {
