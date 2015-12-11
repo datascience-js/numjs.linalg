@@ -28,9 +28,9 @@ var numjs_linalg = {
     /**
      * Creates a new empty matrix, without initializing its internal values
      * usage: var emptyMat = numjs_linalg.empty(3, 3);
-     * this method is used for high performance matrix creation
      * @param rows - the number of matrix rows
      * @param cols - the number of matrix cols
+     *
      */
     empty: function(rows, cols) {
         if (!rows || !cols) {
