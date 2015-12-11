@@ -105,6 +105,49 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
 }
 
 /**
+  *  Eye:
+  *  Creates a new nXm identity matrix - A matrix with ones on the diagonal
+  *  and zeros elsewhere.
+  *
+  *  arguments:
+  *  info[0]: Number n which represents the number of rows in the newly built matrix
+  *  info[1]: Number m which represents the number of cols in the newly built matrix
+  *  info[2]: Buffer(object created by smalloc) for return value(identity matrix nXm).
+*/
+void Eye(const Nan::FunctionCallbackInfo<v8::Value>& info){
+    using CMd = Eigen::Map <const Eigen::MatrixXd >;
+    using Md = Eigen::Map <Eigen::MatrixXd >;
+
+    if (info.Length() < 3) {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    if (!info[0]->IsNumber() || !info[1]->IsNumber()) {
+        Nan::ThrowTypeError("Wrong argument given, should be a number");
+        return;
+    }
+
+    if (info[2]->IsFloat64Array()) {
+        size_t rowsMatrix(info[0]->Uint32Value());
+        size_t colsMatrix(info[1]->Uint32Value());
+
+        double *refResData = *(Nan::TypedArrayContents<double>(info[2]));
+        Md res(refResData, rowsMatrix, colsMatrix);
+        res = Md::Identity(rowsMatrix, colsMatrix);
+
+        Local<Boolean> b = Nan::New(true);
+        info.GetReturnValue().Set(b);
+    }
+
+    else{
+        Nan::ThrowTypeError("Wrong arguments2");
+        Local<Boolean> b = Nan::New(false);
+        info.GetReturnValue().Set(b);
+    }
+}
+
+/**
   *  MatrixPower:
   *  Raise a square matrix to the (integer) power n.
   *
@@ -488,6 +531,7 @@ NAN_METHOD(MatMul){
 void Init(v8::Local<v8::Object> exports) {
 	exports->Set(Nan::New("dot").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
 	exports->Set(Nan::New("matrix_power").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
+	exports->Set(Nan::New("eye").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Eye)->GetFunction());
     exports->Set(Nan::New("inv").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Inverse)->GetFunction());
     exports->Set(Nan::New("det").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
     exports->Set(Nan::New("trace").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Trace)->GetFunction());

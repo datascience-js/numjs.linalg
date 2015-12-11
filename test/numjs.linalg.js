@@ -54,6 +54,66 @@ describe('numjs.linalg - native extension to support linear algebra via the Eige
         })
     })
 
+    describe('eye', function() {
+        it('should create a 3X3 identity matrix', function() {
+            var output = linalg.eye(3, 3);
+            expect(output).to.have.property('rows').equal(3);
+            expect(output).to.have.property('cols').equal(3);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(0);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(0);
+            expect(output.data["6"]).to.equal(0);
+            expect(output.data["7"]).to.equal(0);
+            expect(output.data["8"]).to.equal(1);
+        })
+
+        it('should create a 2X2 identity matrix', function() {
+            var output = linalg.eye(2, 2);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(1);
+        })
+
+        it('should create a 1X1 identity matrix', function() {
+            var output = linalg.eye(1, 1);
+            expect(output).to.have.property('rows').equal(1);
+            expect(output).to.have.property('cols').equal(1);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+        })
+
+        it('should create a 3X4 identity matrix', function() {
+            var output = linalg.eye(3, 4);
+            expect(output).to.have.property('rows').equal(3);
+            expect(output).to.have.property('cols').equal(4);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(0);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(0);
+            expect(output.data["6"]).to.equal(0);
+            expect(output.data["7"]).to.equal(0);
+            expect(output.data["8"]).to.equal(1);
+            expect(output.data["9"]).to.equal(0);
+            expect(output.data["10"]).to.equal(0);
+            expect(output.data["11"]).to.equal(0);
+        })
+    })
+
     describe('matrix_power', function () {
         it('should raise a 2-D array(square) to the power 3', function () {
             var jsMatLeft = new linalg.Matrix([1, 1, 1, 1], 2, 2);

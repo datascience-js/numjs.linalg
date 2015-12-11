@@ -81,6 +81,16 @@ var numjs_linalg = {
         return out;
     },
 
+    eye: function(n, m) {
+        if (n <= 0 || m <= 0) {
+            throw new Error("The rows and cols arguments must be positive");
+        }
+
+        var out = new numjs_linalg.Matrix([], n, m);
+        linalg.eye(n, m, out.data);
+        return out;
+    },
+
     matrix_power: function (matrix, n) {
         if (n === 1) {
             return matrix;
