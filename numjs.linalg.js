@@ -106,13 +106,38 @@ var numjs_linalg = {
     },
 
     /**
-     * Creates an identity matrix - a matrix with ones on the main diagonal and zeros elsewhere
+     * Creates a square nXn identity matrix - a matrix with ones on the main diagonal
+     * and zeros elsewhere.
+     * usage: var mat = numjs_linalg.identity(3);
+     *
+     * @param n - the dimensions of the nXn matrix
+     */
+    identity: function(n) {
+        if (!n || n <= 0) {
+            throw new Error("invalid argument, should be a positive number");
+        }
+
+        var out = new numjs_linalg.Matrix([], n, n);
+        linalg.identity(n, out.data);
+        return out;
+    },
+
+    /**
+     * Creates a matrix with ones on the main diagonal and zeros elsewhere
      * the matrix can be of any size, not necessarily nXn
      * usage: var mat = numjs_linalg.eye(3,3);
      * @param n - the number of matrix rows
-     * @param m - the number of matrix cols
+     * @param m - the number of matrix cols - optional parameter, defaults to n
      */
     eye: function(n, m) {
+        if (!n) {
+            throw new Error("Undefined arguments")
+        }
+
+        if (!m) {
+            m = n;
+        }
+
         if (n <= 0 || m <= 0) {
             throw new Error("The rows and cols arguments must be positive");
         }
