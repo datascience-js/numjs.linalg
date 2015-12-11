@@ -147,6 +147,28 @@ var numjs_linalg = {
         return out;
     },
 
+    /**
+     * Creates a matrix with ones at and below the main diagonal and zeros elsewhere
+     * matrix size is nXm.
+     *
+     * usage: var mat = tri(3,3);
+     * @param n - the number of matrix rows
+     * @param m - the number of matrix cols
+     */
+    tri : function(n, m) {
+        if (!n || !m) {
+            throw new Error("Must specify two arguments - number of rows and number of cols");
+        }
+
+        if (n <= 0 || m <= 0) {
+            throw new Error("The rows and cols arguments must be positive");
+        }
+
+        var out = new numjs_linalg.Matrix([], n, m);
+        linalg.tri(n,m, out.data);
+        return out;
+    },
+
     matrix_power: function (matrix, n) {
         if (n === 1) {
             return matrix;

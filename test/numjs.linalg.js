@@ -94,6 +94,90 @@ describe('numjs.linalg - native extension to support linear algebra via the Eige
         })
     })
 
+    describe('tri', function() {
+        it ('should be a 1X1 with single 1 value', function() {
+            var output = linalg.tri(1, 1);
+            expect(output).to.have.property('rows').equal(1);
+            expect(output).to.have.property('cols').equal(1);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+        })
+
+        it ('should be a 2X2 lower diagonal matrix', function() {
+            var output = linalg.tri(2, 2);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(1);
+        })
+
+        it ('should be a 3X3 lower diagonal matrix', function() {
+            var output = linalg.tri(3, 3);
+            expect(output).to.have.property('rows').equal(3);
+            expect(output).to.have.property('cols').equal(3);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(0);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(1);
+            expect(output.data["6"]).to.equal(0);
+            expect(output.data["7"]).to.equal(0);
+            expect(output.data["8"]).to.equal(1);
+        })
+
+        it ('should be a 4X4 lower diagonal matrix', function() {
+            var output = linalg.tri(4, 4);
+            expect(output).to.have.property('rows').equal(4);
+            expect(output).to.have.property('cols').equal(4);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(1);
+            expect(output.data["4"]).to.equal(0);
+            expect(output.data["5"]).to.equal(1);
+            expect(output.data["6"]).to.equal(1);
+            expect(output.data["7"]).to.equal(1);
+            expect(output.data["8"]).to.equal(0);
+            expect(output.data["9"]).to.equal(0);
+            expect(output.data["10"]).to.equal(1);
+            expect(output.data["11"]).to.equal(1);
+            expect(output.data["12"]).to.equal(0);
+            expect(output.data["13"]).to.equal(0);
+            expect(output.data["14"]).to.equal(0);
+            expect(output.data["15"]).to.equal(1);
+        })
+
+        it('should create a 3X4 lower diagonal matrix', function() {
+            var output = linalg.tri(3, 4);
+            expect(output).to.have.property('rows').equal(3);
+            expect(output).to.have.property('cols').equal(4);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(0);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(1);
+            expect(output.data["6"]).to.equal(0);
+            expect(output.data["7"]).to.equal(0);
+            expect(output.data["8"]).to.equal(1);
+            expect(output.data["9"]).to.equal(0);
+            expect(output.data["10"]).to.equal(0);
+            expect(output.data["11"]).to.equal(0);
+        })
+    })
+
     describe('eye', function() {
         it('should create a 3X3 identity matrix', function() {
             var output = linalg.eye(3, 3);
