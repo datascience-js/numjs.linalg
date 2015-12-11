@@ -6,6 +6,8 @@ var numjs_linalg = {
         this.cols = cols;
         this.data = new Float64Array(rows * cols);
 
+        if (arguments.length == 2) return;
+
         if (array.length === 0) {
             for (var j = 0; j < rows * cols; j++) {
                 this.data[j] = 0.0;
@@ -20,6 +22,28 @@ var numjs_linalg = {
             throw new Error("The array.length !== rows*cols");
 
         }
+    },
+
+
+    /**
+     * Creates a new empty matrix, without initializing its internal values
+     * usage: var emptyMat = numjs_linalg.empty(3, 3);
+     * this method is used for high performance matrix creation
+     * @param rows - the number of matrix rows
+     * @param cols - the number of matrix cols
+     */
+    empty: function(rows, cols) {
+        if (!rows || !cols) {
+            throw new Error("input parameters are undefined")
+        }
+
+        if (rows <= 0 || cols <= 0) {
+            throw new Error("rows and cols parameters must be positive");
+        }
+
+        var mat = new numjs_linalg.Matrix([], rows, cols);
+        mat.data = new Float64Array(rows * cols);
+        return mat;
     },
 
     dot: function (leftMatrix, rightMatrix, out) {
@@ -81,6 +105,13 @@ var numjs_linalg = {
         return out;
     },
 
+    /**
+     * Creates an identity matrix - a matrix with ones on the main diagonal and zeros elsewhere
+     * the matrix can be of any size, not necessarily nXn
+     * usage: var mat = numjs_linalg.eye(3,3);
+     * @param n - the number of matrix rows
+     * @param m - the number of matrix cols
+     */
     eye: function(n, m) {
         if (n <= 0 || m <= 0) {
             throw new Error("The rows and cols arguments must be positive");
