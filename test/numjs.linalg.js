@@ -175,6 +175,87 @@ describe('numjs.linalg - native extension to support linear algebra via the Eige
         })
     })
 
+    describe('triu', function() {
+        it ('should be a 1X1 with single 1 value', function() {
+            var inputMat = new linalg.Matrix([1], 1, 1);
+            var output = linalg.triu(inputMat);
+            expect(output).to.have.property('rows').equal(1);
+            expect(output).to.have.property('cols').equal(1);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+        })
+
+        it ('should be a 2X2 upper triagonal matrix', function() {
+            var inputMat = new linalg.Matrix([1,1,1,1], 2, 2);
+            var output = linalg.triu(inputMat);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(1);
+        })
+
+        it ('should be a 2X2 lower upper triagonal matrix (custom values)', function() {
+            var inputMat = new linalg.Matrix([1,2,3,4], 2, 2);
+            var output = linalg.triu(inputMat);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(3);
+            expect(output.data["3"]).to.equal(4);
+        })
+
+        it ('should be a 3X3 upper triagonal matrix', function() {
+            var inputMat = new linalg.Matrix([1,1,1,1,1,1,1,1,1], 3, 3);
+            var output = linalg.triu(inputMat);
+            expect(output).to.have.property('rows').equal(3);
+            expect(output).to.have.property('cols').equal(3);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(1);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(0);
+            expect(output.data["6"]).to.equal(1);
+            expect(output.data["7"]).to.equal(1);
+            expect(output.data["8"]).to.equal(1);
+        })
+
+        it ('should be a 4X4 upper triagonal matrix', function() {
+            var inputMat = new linalg.Matrix([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], 4, 4);
+            var output = linalg.triu(inputMat);
+            expect(output).to.have.property('rows').equal(4);
+            expect(output).to.have.property('cols').equal(4);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(0);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(1);
+            expect(output.data["6"]).to.equal(0);
+            expect(output.data["7"]).to.equal(0);
+            expect(output.data["8"]).to.equal(1);
+            expect(output.data["9"]).to.equal(1);
+            expect(output.data["10"]).to.equal(1);
+            expect(output.data["11"]).to.equal(0);
+            expect(output.data["12"]).to.equal(1);
+            expect(output.data["13"]).to.equal(1);
+            expect(output.data["14"]).to.equal(1);
+            expect(output.data["15"]).to.equal(1);
+        })
+    })
+
     describe('tri', function() {
         it ('should be a 1X1 with single 1 value', function() {
             var output = linalg.tri(1, 1);

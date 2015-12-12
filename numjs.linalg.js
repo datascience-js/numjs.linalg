@@ -210,6 +210,25 @@ var numjs_linalg = {
     },
 
     /**
+     * Creates a copy of a given matrix with all elements below the diagonal zeroed
+     * ==============
+     * usage example:
+     * var mat = new linalg.Matrix([1,2,3,4,5,6,7,8,9], 3, 3); <- input matrix
+     * var triMat = linalg.tril(mat); <- creates a upper triagonal matrix of mat
+     * ==============
+     * @param matrix - the matrix to convert into a lower triagonal matrix
+     */
+    triu: function(matrix) {
+        if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
+            throw new Error("The argument must be instanceof numjs.Matrix");
+        }
+
+        var out = new numjs_linalg.Matrix([], matrix.rows, matrix.cols);
+        linalg.triu(matrix.data, matrix.rows, matrix.cols, out.data);
+        return out;
+    },
+
+    /**
      * Raise a square matrix to the (integer) power n.
      * =================
      * usage example:

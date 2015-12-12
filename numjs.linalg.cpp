@@ -297,7 +297,65 @@ void Tril(const Nan::FunctionCallbackInfo<v8::Value>& info){
     }
 }
 
+/**
+  *  Triu:
+  *  Creates a copy of a given matrix with all elements below the diagonal zeroed
+  *
+  *  arguments:
+  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be converted to lower diagonal matrix
+  *  info[1]: Number represent the number of rows of the matrix.
+  *  info[2]: Number represent the number of columns of the matrix.
+  *  info[3]: Buffer(object created by smalloc) for return value(M**m).
+*/
+void Triu(const Nan::FunctionCallbackInfo<v8::Value>& info){
+    using CMd = Eigen::Map <const Eigen::MatrixXd >;
+    using Md = Eigen::Map <Eigen::MatrixXd >;
 
+    if (info.Length() < 4) {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
+        Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
+        size_t rowsMatrix(info[1]->Uint32Value());
+        size_t colsMatrix(info[2]->Uint32Value());
+        Md inputMat(refMatrixData, rowsMatrix, colsMatrix);
+
+		if (info[3]->IsFloat64Array()) {
+			double *refResData = *(Nan::TypedArrayContents<double>(info[3]));
+            Md res(refResData, rowsMatrix, colsMatrix);
+            for (int i = 0; i < rowsMatrix; i++) {
+                for (int j = 0; j < colsMatrix; j++) {
+                    if (j < i) {
+                        res(i, j) = 0;
+                    } else {
+                        res(i, j) = inputMat(i, j);
+                    }
+                }
+            }
+
+            Local<Boolean> b = Nan::New(true);
+            info.GetReturnValue().Set(b);
+        }
+
+        else{
+            Nan::ThrowTypeError("Wrong argument - output matrix data should be float64array");
+            Local<Boolean> b = Nan::New(false);
+            info.GetReturnValue().Set(b);
+        }
+    }
+    else{
+        Nan::ThrowTypeError("Wrong argument - input matrix data should be float64array");
+        Local<Boolean> b = Nan::New(false);
+        info.GetReturnValue().Set(b);
+    }
+}
 
 /**
   *  MatrixPower:
@@ -687,6 +745,7 @@ void Init(v8::Local<v8::Object> exports) {
 	exports->Set(Nan::New("identity").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Identity)->GetFunction());
 	exports->Set(Nan::New("tri").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Tri)->GetFunction());
 	exports->Set(Nan::New("tril").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Tril)->GetFunction());
+	exports->Set(Nan::New("triu").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Triu)->GetFunction());
     exports->Set(Nan::New("inv").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Inverse)->GetFunction());
     exports->Set(Nan::New("det").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Det)->GetFunction());
     exports->Set(Nan::New("trace").ToLocalChecked(),	Nan::New<v8::FunctionTemplate>(Trace)->GetFunction());
