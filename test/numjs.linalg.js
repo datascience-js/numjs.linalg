@@ -175,6 +175,136 @@ describe('numjs.linalg - native extension to support linear algebra via the Eige
         })
     })
 
+    describe('zeros', function() {
+        it('should create a 2X2 zero filled matrix', function() {
+            var output = linalg.zeros(2, 2);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+            expect(output.data["0"]).to.equal(0);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(0);
+        })
+
+        it('should create a 2X2 zero filled matrix (one parameter specified)', function() {
+            var output = linalg.zeros(2);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+            expect(output.data["0"]).to.equal(0);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(0);
+        })
+
+        it ('should be a 3X3 zero filled matrix', function() {
+            var output = linalg.zeros(3, 3);
+            expect(output).to.have.property('rows').equal(3);
+            expect(output).to.have.property('cols').equal(3);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(0);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(0);
+            expect(output.data["4"]).to.equal(0);
+            expect(output.data["5"]).to.equal(0);
+            expect(output.data["6"]).to.equal(0);
+            expect(output.data["7"]).to.equal(0);
+            expect(output.data["8"]).to.equal(0);
+        })
+
+        it ('should be a 4X4 zero filled matrix', function() {
+            var output = linalg.zeros(4, 4);
+            expect(output).to.have.property('rows').equal(4);
+            expect(output).to.have.property('cols').equal(4);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(0);
+            expect(output.data["1"]).to.equal(0);
+            expect(output.data["2"]).to.equal(0);
+            expect(output.data["3"]).to.equal(0);
+            expect(output.data["4"]).to.equal(0);
+            expect(output.data["5"]).to.equal(0);
+            expect(output.data["6"]).to.equal(0);
+            expect(output.data["7"]).to.equal(0);
+            expect(output.data["8"]).to.equal(0);
+            expect(output.data["9"]).to.equal(0);
+            expect(output.data["10"]).to.equal(0);
+            expect(output.data["11"]).to.equal(0);
+            expect(output.data["12"]).to.equal(0);
+            expect(output.data["13"]).to.equal(0);
+            expect(output.data["14"]).to.equal(0);
+            expect(output.data["15"]).to.equal(0);
+        })
+    })
+
+    describe('ones', function() {
+        it('should create a 2X2 ones matrix', function() {
+            var output = linalg.ones(2, 2);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(1);
+        })
+
+        it('should create a 2X2 ones matrix (one parameter specified)', function() {
+            var output = linalg.ones(2);
+            expect(output).to.have.property('rows').equal(2);
+            expect(output).to.have.property('cols').equal(2);
+            expect(output).to.have.property('data');
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(1);
+        })
+
+        it ('should be a 3X3 ones matrix', function() {
+            var output = linalg.ones(3, 3);
+            expect(output).to.have.property('rows').equal(3);
+            expect(output).to.have.property('cols').equal(3);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(1);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(1);
+            expect(output.data["6"]).to.equal(1);
+            expect(output.data["7"]).to.equal(1);
+            expect(output.data["8"]).to.equal(1);
+        })
+
+        it ('should be a 4X4 ones matrix', function() {
+            var output = linalg.ones(4, 4);
+            expect(output).to.have.property('rows').equal(4);
+            expect(output).to.have.property('cols').equal(4);
+            expect(output).to.have.property('data');
+
+            expect(output.data["0"]).to.equal(1);
+            expect(output.data["1"]).to.equal(1);
+            expect(output.data["2"]).to.equal(1);
+            expect(output.data["3"]).to.equal(1);
+            expect(output.data["4"]).to.equal(1);
+            expect(output.data["5"]).to.equal(1);
+            expect(output.data["6"]).to.equal(1);
+            expect(output.data["7"]).to.equal(1);
+            expect(output.data["8"]).to.equal(1);
+            expect(output.data["9"]).to.equal(1);
+            expect(output.data["10"]).to.equal(1);
+            expect(output.data["11"]).to.equal(1);
+            expect(output.data["12"]).to.equal(1);
+            expect(output.data["13"]).to.equal(1);
+            expect(output.data["14"]).to.equal(1);
+            expect(output.data["15"]).to.equal(1);
+        })
+    })
+
     describe('triu', function() {
         it ('should be a 1X1 with single 1 value', function() {
             var inputMat = new linalg.Matrix([1], 1, 1);

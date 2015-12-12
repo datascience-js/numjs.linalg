@@ -7,21 +7,23 @@ var numjs_linalg = {
      * usage example:
      * var newMat = new numjs_linalg.Matrix([1,1,1,1], 2, 2); <- creates a new 2x2 ones matrix
      * ================
+     *
      * @param array - an array of data to populate the newly built matrix
      * @param rows - the newly built matrix number of rows
      * @param cols - the newly built matrix number of cols
      * @constructor
      */
-    Matrix: function (array, rows, cols) {
+    Matrix: function (array, rows, cols, internalData) {
         this.rows = rows;
         this.cols = cols;
         this.data = new Float64Array(rows * cols);
 
-        if (arguments.length == 2) return;
+        if (arguments.length > 3 && internalData && internalData["isEmpty"]) return;
 
         if (array.length === 0) {
+            var defaultValue = (internalData && internalData["isOnes"])? 1.0 : 0.0;
             for (var j = 0; j < rows * cols; j++) {
-                this.data[j] = 0.0;
+                this.data[j] = defaultValue;
             }
         }
         else if (array.length === rows * cols) {
@@ -33,6 +35,62 @@ var numjs_linalg = {
             throw new Error("The array.length !== rows*cols");
 
         }
+    },
+
+    /**
+     * Creates a new zero filled matrix with the shape specified by number of rows and cols
+     * =======================
+     * usage example:
+     * var newMat = numjs_linalg.zeros(3,4); <- creates a new 3X4 zero filled matrix
+     * var newMat = numjs_linalg.zeros(3); <- creates a new 3X3 zero filled matrix
+     * =======================
+     *
+     * @param rows - the number of rows for the newly built matrix
+     * @param cols - the number of cols for the newly built matrix - OPTIONAL - defaults to rows
+     * @returns {numjs_linalg.Matrix}
+     */
+    zeros: function(rows, cols) {
+        if (!rows)  {
+            throw new Error("now input parameters given");
+        }
+
+        if (!cols) {
+            cols = rows;
+        }
+
+        if (rows <= 0 || cols <= 0) {
+            throw new Error("rows and cols parameters must be positive numbers");
+        }
+
+        return new numjs_linalg.Matrix([], rows, cols);
+    },
+
+    /**
+     * Creates a new one-value filled matrix with the shape specified by number of rows and cols
+     * =======================
+     * usage example:
+     * var newMat = numjs_linalg.ones(3,4); <- creates a new 3X4 one-value filled matrix
+     * var newMat = numjs_linalg.ones(3); <- creates a new 3X3 one-value filled matrix
+     * ========================
+     *
+     * @param rows - the number of rows for the newly built matrix
+     * @param cols - the number of cols for the newly built matrix - OPTIONAL - defaults to rows
+     * @returns {numjs_linalg.Matrix}
+     */
+    ones: function(rows, cols) {
+        if (!rows)  {
+            throw new Error("now input parameters given");
+        }
+
+        if (!cols) {
+            cols = rows;
+        }
+
+        if (rows <= 0 || cols <= 0) {
+            throw new Error("rows and cols parameters must be positive numbers");
+        }
+
+        return new numjs_linalg.Matrix([], rows, cols, {isOnes:true});
     },
 
 
@@ -54,9 +112,7 @@ var numjs_linalg = {
             throw new Error("rows and cols parameters must be positive");
         }
 
-        var mat = new numjs_linalg.Matrix([], rows, cols);
-        mat.data = new Float64Array(rows * cols);
-        return mat;
+        return new numjs_linalg.Matrix([], rows, cols, {isEmpty: true});
     },
 
     dot: function (leftMatrix, rightMatrix, out) {
