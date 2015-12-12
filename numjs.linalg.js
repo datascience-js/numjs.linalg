@@ -5,7 +5,10 @@ var numjs_linalg = {
      * The matrix base class. represents a rowsXcols matrix
      * ================
      * usage example:
-     * var newMat = new numjs_linalg.Matrix([1,1,1,1], 2, 2); <- creates a new 2x2 ones matrix
+     * var onesMat = new numjs_linalg.Matrix([1,1,1,1], 2, 2); <- creates a new 2x2 ones matrix
+     * var zeroMat = new numjs_linalg.Matrix([], 4, 4); <- creates a new zero filled 4x4 matrix
+     * var customValsMat = new numjs_linalg.Matrix([1,2,3,4], 2, 2); <- creates a new 2x2 matrix with values {1,2;3,4}
+     * var customValsVector = new numjs_linalg.Matrix([1,2,3,4], 1, 4); <- creates a vector with values {1,2,3,4}
      * ================
      *
      * @param array - an array of data to populate the newly built matrix
@@ -43,6 +46,8 @@ var numjs_linalg = {
      * usage example:
      * var newMat = numjs_linalg.zeros(3,4); <- creates a new 3X4 zero filled matrix
      * var newMat = numjs_linalg.zeros(3); <- creates a new 3X3 zero filled matrix
+     * var zeroVector = numjs_linalg.zeros(1, 4) <- creates a new zero filled vector
+     * var zeroScalar = numjs_linalg.zeros(1) <- creates a 0 value scalar
      * =======================
      *
      * @param rows - the number of rows for the newly built matrix
@@ -71,10 +76,12 @@ var numjs_linalg = {
      * usage example:
      * var newMat = numjs_linalg.ones(3,4); <- creates a new 3X4 one-value filled matrix
      * var newMat = numjs_linalg.ones(3); <- creates a new 3X3 one-value filled matrix
+     * var oneVector = numjs_linalg.ones(1, 4) <- creates a new ones filled vector
+     * var oneScalar = numjs_linalg.ones(1) <- creates a 1 value scalar
      * ========================
      *
      * @param rows - the number of rows for the newly built matrix
-     * @param cols - the number of cols for the newly built matrix - OPTIONAL - defaults to rows
+     * @param cols - the number of cols for the newly built matrix - optional - defaults to rows
      * @returns {numjs_linalg.Matrix}
      */
     ones: function(rows, cols) {
@@ -99,13 +106,20 @@ var numjs_linalg = {
      * ===================
      * usage example:
      * var emptyMat = numjs_linalg.empty(3, 3); <- creates a 3x3 empty matrix
-     * ==============
+     * var nonSquareEmpty = numjs_linalg.empty(3, 4); <- creates a 3x4 empty matrix
+     * var emptySquareMat = numjs_linalg.empty(5); <-creates a 5x5 empty matrix
+     * ===================
+     *
      * @param rows - the number of matrix rows
-     * @param cols - the number of matrix cols
+     * @param cols - the number of matrix cols - optional - defaults to rows
      */
     empty: function(rows, cols) {
-        if (!rows || !cols) {
+        if (!rows) {
             throw new Error("input parameters are undefined")
+        }
+
+        if (!cols) {
+            cols = rows;
         }
 
         if (rows <= 0 || cols <= 0) {
@@ -115,6 +129,24 @@ var numjs_linalg = {
         return new numjs_linalg.Matrix([], rows, cols, {isEmpty: true});
     },
 
+    /**
+     * Computes the Dot product of matrices.
+     * For 2-D matrices it is equivalent to matrix multiplication,
+     * and for 1-D matrix it is equivalent to inner product of vectors
+     * ==================
+     * usage example:
+     * var jsMatLeft = linalg.ones([1, 1, 1, 1], 1, 4); <- creates a ones vector
+     * var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 4, 1); <- creates a custom values vector
+     * var dotproduct = linalg.dot(jsMatLeft, jsMatRight) <- computes the dot product == 6
+     *
+     * var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 2, 2); <- creates a new custom values matrix
+     * var dotproduct = linalg.dot(2, jsMatRight); <- computes the dot product of the matrix with a number
+     * ==================
+     *
+     * @param leftMatrix - The left input matrix to perform dot computation
+     * @param rightMatrix - The right input matrix to perform dot computation
+     * @param out - The dot product of two input matrices
+     */
     dot: function (leftMatrix, rightMatrix, out) {
         var lrows = 1, lcols = 1, rrows = 1, rcols = 1;
 
@@ -180,7 +212,10 @@ var numjs_linalg = {
      * =====================
      * usage example:
      * var mat = numjs_linalg.identity(3); <- creates a 3x3 identity matrix
+     * var mat2 = numjs_linalg.identity(5); <- creates a 5x5 identity matrix
+     * var scalar = numjs_linalg.identity(1); <- creates a single 1 value (scalar)
      * =====================
+     *
      * @param n - the dimensions of the nXn matrix
      */
     identity: function(n) {
@@ -200,7 +235,10 @@ var numjs_linalg = {
      * usage example:
      * var eyeMat = numjs_linalg.eye(3,4); <- creates a 3x4 eye matrix
      * var idMat = numjs_linalg.eye(3); <- creates a 3x3 identity matrix
+     * var eyeMat2 = numjs_linalg.eye(5, 5) <- creates a 5x5 indentity matrix
+     * var scalar = numjs_linalg.eye(1) <- creates a scalar with the value of 1.
      * =========================
+     *
      * @param n - the number of matrix rows
      * @param m - the number of matrix cols - optional parameter, defaults to n
      */
@@ -228,7 +266,10 @@ var numjs_linalg = {
      * ============================
      * usage example:
      * var mat = tri(3,3); <- creates a 3x3 lower triagonal matrix
+     * var mat = tri(5,7); <- creates a 5x7 lower triagonal matrix
+     * var scalar = tri(1,1); <- creates a scalar with the value of 1
      * ============================
+     *
      * @param n - the number of matrix rows
      * @param m - the number of matrix cols
      */
@@ -248,11 +289,16 @@ var numjs_linalg = {
 
     /**
      * Creates a copy of a given matrix with all elements above the diagonal zeroed
+     * (a lower triagonal copy of the input)
      * ==============
      * usage example:
      * var mat = new linalg.Matrix([1,2,3,4,5,6,7,8,9], 3, 3); <- input matrix
-     * var triMat = linalg.tril(mat); <- creates a lower triagonal matrix of mat
+     * var trilMat = linalg.tril(mat); <- creates a lower triagonal copy of mat
+     *
+     * var mat = linalg.ones(5); <- creates a 5x5 ones matrix
+     * var trilMat = linalg.tril(mat); <- creates a lower triagonal copy of mat
      * ==============
+     *
      * @param matrix - the matrix to convert into a lower triagonal matrix
      */
     tril: function(matrix) {
@@ -270,8 +316,12 @@ var numjs_linalg = {
      * ==============
      * usage example:
      * var mat = new linalg.Matrix([1,2,3,4,5,6,7,8,9], 3, 3); <- input matrix
-     * var triMat = linalg.tril(mat); <- creates a upper triagonal matrix of mat
+     * var triMat = linalg.tril(mat); <- creates an upper triagonal matrix of mat
+     *
+     * var mat = linalg.ones(5); <- creates a 5x5 ones matrix
+     * var trilMat = linalg.tril(mat); <- creates an upper triagonal copy of mat
      * ==============
+     *
      * @param matrix - the matrix to convert into a lower triagonal matrix
      */
     triu: function(matrix) {
@@ -290,7 +340,11 @@ var numjs_linalg = {
      * usage example:
      * var inputMat = new linalg.Matrix([1, 1, 1, 1], 2, 2); <- create a new input 2x2 ones matrix
      * var powerMat = linalg.matrix_power(inputMat, 3); <- returns a new matrix raised to the power of 3
+     *
+     * var inputMat = new linalg.Matrix([1,1,1,1, 2, 2); <- create a new input 2x2 ones matrix
+     * var identityMat = linalg.matrix_power(inputMat, 0); <- create identity matrix by raising it to the power of 0
      * =================
+     *
      * @param matrix - the input matrix
      * @param n - number that represents the exponent, can be positive, negative or zero.
      */
@@ -420,6 +474,19 @@ var numjs_linalg = {
         return x;
     },
 
+    /**
+     * Multiplies two matrices
+     * ========================
+     * usage example:
+     * var mat1 = linalg.ones(3,3); <- create a 3x3 ones matrix
+     * var mat2 = linalg.ones(3,3); <- create a 3x3 ones matrix
+     * var resMat = linalg.matrix_mul(mat1, mat2); <- create a matrix which is the product of the two matrices multiplication
+     * ========================
+     *
+     * @param matrixA - the first input matrix
+     * @param matrixB - the second input matrix
+     * @returns {numjs_linalg.Matrix}
+     */
     matrix_mul: function (matrixA, matrixB) {
         if (!matrixA || !(matrixA instanceof numjs_linalg.Matrix) || !matrixB || !(matrixB instanceof numjs_linalg.Matrix)) {
             throw new Error("The first arg must be instanceof numjs.Matrix");
