@@ -1,6 +1,17 @@
 var linalg = require('./build/Release/numjs.linalg');
 
 var numjs_linalg = {
+    /**
+     * The matrix base class. represents a rowsXcols matrix
+     * ================
+     * usage example:
+     * var newMat = new numjs_linalg.Matrix([1,1,1,1], 2, 2); <- creates a new 2x2 ones matrix
+     * ================
+     * @param array - an array of data to populate the newly built matrix
+     * @param rows - the newly built matrix number of rows
+     * @param cols - the newly built matrix number of cols
+     * @constructor
+     */
     Matrix: function (array, rows, cols) {
         this.rows = rows;
         this.cols = cols;
@@ -26,11 +37,13 @@ var numjs_linalg = {
 
 
     /**
-     * Creates a new empty matrix, without initializing its internal values
-     * usage: var emptyMat = numjs_linalg.empty(3, 3);
+     * Creates a new empty matrix, with no initialized values within it.
+     * ===================
+     * usage example:
+     * var emptyMat = numjs_linalg.empty(3, 3); <- creates a 3x3 empty matrix
+     * ==============
      * @param rows - the number of matrix rows
      * @param cols - the number of matrix cols
-     *
      */
     empty: function(rows, cols) {
         if (!rows || !cols) {
@@ -108,8 +121,10 @@ var numjs_linalg = {
     /**
      * Creates a square nXn identity matrix - a matrix with ones on the main diagonal
      * and zeros elsewhere.
-     * usage: var mat = numjs_linalg.identity(3);
-     *
+     * =====================
+     * usage example:
+     * var mat = numjs_linalg.identity(3); <- creates a 3x3 identity matrix
+     * =====================
      * @param n - the dimensions of the nXn matrix
      */
     identity: function(n) {
@@ -125,7 +140,11 @@ var numjs_linalg = {
     /**
      * Creates a matrix with ones on the main diagonal and zeros elsewhere
      * the matrix can be of any size, not necessarily nXn
-     * usage: var mat = numjs_linalg.eye(3,3);
+     * =========================
+     * usage example:
+     * var eyeMat = numjs_linalg.eye(3,4); <- creates a 3x4 eye matrix
+     * var idMat = numjs_linalg.eye(3); <- creates a 3x3 identity matrix
+     * =========================
      * @param n - the number of matrix rows
      * @param m - the number of matrix cols - optional parameter, defaults to n
      */
@@ -150,8 +169,10 @@ var numjs_linalg = {
     /**
      * Creates a matrix with ones at and below the main diagonal and zeros elsewhere
      * matrix size is nXm.
-     *
-     * usage: var mat = tri(3,3);
+     * ============================
+     * usage example:
+     * var mat = tri(3,3); <- creates a 3x3 lower triagonal matrix
+     * ============================
      * @param n - the number of matrix rows
      * @param m - the number of matrix cols
      */
@@ -169,6 +190,35 @@ var numjs_linalg = {
         return out;
     },
 
+    /**
+     * Creates a copy of a given matrix with all elements above the diagonal zeroed
+     * ==============
+     * usage example:
+     * var mat = new linalg.Matrix([1,2,3,4,5,6,7,8,9], 3, 3); <- input matrix
+     * var triMat = linalg.tril(mat); <- creates a lower triagonal matrix of mat
+     * ==============
+     * @param matrix - the matrix to convert into a lower triagonal matrix
+     */
+    tril: function(matrix) {
+        if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
+            throw new Error("The argument must be instanceof numjs.Matrix");
+        }
+
+        var out = new numjs_linalg.Matrix([], matrix.rows, matrix.cols);
+        linalg.tril(matrix.data, matrix.rows, matrix.cols, out.data);
+        return out;
+    },
+
+    /**
+     * Raise a square matrix to the (integer) power n.
+     * =================
+     * usage example:
+     * var inputMat = new linalg.Matrix([1, 1, 1, 1], 2, 2); <- create a new input 2x2 ones matrix
+     * var powerMat = linalg.matrix_power(inputMat, 3); <- returns a new matrix raised to the power of 3
+     * =================
+     * @param matrix - the input matrix
+     * @param n - number that represents the exponent, can be positive, negative or zero.
+     */
     matrix_power: function (matrix, n) {
         if (n === 1) {
             return matrix;
@@ -201,6 +251,16 @@ var numjs_linalg = {
         return out;
     },
 
+    /**
+     * Computes The sum along the diagonals of a matrix
+     * =================
+     * usage example:
+     * var inputMat = new linalg.Matrix([1, 1, 1, 1], 2, 2); <- create a new 2x2 ones matrix
+     * var trace = linalg.trace(inputMat); <- returns the matrix trace
+     * ================
+     *
+     * @param matrix - the input matrix to compute its trace
+     */
     trace: function(matrix) {
         if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
             throw new Error("The first arg must be instanceof numjs.Matrix");
@@ -209,6 +269,17 @@ var numjs_linalg = {
         return linalg.trace(matrix.data, matrix.rows, matrix.cols);
     },
 
+    /**
+     * Computes the determinant of a square nxn matrix
+     * =================
+     * usage example:
+     * var inputMat = new linalg.Matrix([1, 1, 1, 1], 2, 2); <- create a new 2X2 ones matrix
+     * var det = linalg.det(inputMat); <- compute return the input matrix determinant value
+     * =================
+     *
+     * @param matrix - the input matrix to compute its determinant
+     * @returns the determinant of the matrix
+     */
     det: function (matrix) {
         if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
             throw new Error("The first arg must be instanceof numjs.Matrix");
@@ -221,6 +292,21 @@ var numjs_linalg = {
         return linalg.det(matrix.data, matrix.rows, matrix.cols);
     },
 
+    /**
+     * Computes The input matrix rank using SVD method
+     *
+     * =====================
+     * usage example:
+     * var inputMat = new linalg.Matrix([1, 1, 1, 1], 1, 4); <- creates a new 1X4 ones vector
+     * var rank = linalg.matrix_rank(inputMat); <- calculates the rank
+     * =====================
+     *
+     * @param matrix - the input matrix to compute its rank
+     * @param tol - Number which represents the threshold which SVD values are considered zero.
+     *              If this arg is not given, and input matrix has only singular values,
+     *              and eps is the epsilon value for datatype of the matrix,
+     *              then tol is set to matrix.max() * max(matrix.shape) * eps
+     */
     matrix_rank: function (matrix, tol) {
         if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
             throw new Error("The first arg must be instanceof numjs.Matrix");
