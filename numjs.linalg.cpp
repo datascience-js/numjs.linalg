@@ -105,6 +105,261 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
 }
 
 /**
+  *  Inner:
+  *  Inner product of two arrays.
+  *  For 2-D arrays it is equivalent to sum product over the last axes, and for 1-D arrays to inner product of vectors
+  * (without complex conjugation).
+  * If a and b are nonscalar, their last dimensions of must match. (assumption)
+  *
+  *  arguments:
+  *  info[0]: Number represent the number of rows of the left matrix.
+  *  info[1]: Number represent the number of columns of the left matrix.
+  *  info[2]: Buffer(object created by smalloc) represent the left numjs.Matrix object .
+  *  info[3]: Number represent the number of rows of the right matrix.
+  *  info[4]: Number represent the number of columns of the right matrix.
+  *  info[5]: Buffer(object created by smalloc) represent the right numjs.Matrix object .
+  *  info[6]: Buffer(object created by smalloc) for return value.
+*/
+void Inner(const Nan::FunctionCallbackInfo<v8::Value>& info){
+    using CMd = Eigen::Map <const Eigen::MatrixXd >;
+    using Md = Eigen::Map <Eigen::MatrixXd >;
+
+	if (info.Length() < 7) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+    if (!info[0]->IsUint32() || !info[1]->IsUint32() ||
+    	!info[3]->IsUint32() || !info[4]->IsUint32()) {
+    	Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+	if (info[2]->IsNumber()) {
+	    double leftParam(info[2]->NumberValue());
+
+	    if(!info[5]->IsNumber()){
+			if (info[5]->IsFloat64Array()) {
+				double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
+                size_t rowsRight(info[3]->Uint32Value());
+                size_t colsRight(info[4]->Uint32Value());
+                CMd rightMat(refRightData, rowsRight, colsRight);
+
+				if (info[6]->IsFloat64Array()) {
+					double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
+                    Md res(refResData, rowsRight, colsRight);
+                    res = leftParam * rightMat;
+
+                    Local<Boolean> b = Nan::New(true);
+                    info.GetReturnValue().Set(b);
+                }
+            }
+        }
+
+    }
+	else{
+		if (info[2]->IsFloat64Array()) {
+			double *refLeftData = *(Nan::TypedArrayContents<double>(info[2]));
+	        size_t rowsLeft(info[0]->Uint32Value());
+            size_t colsLeft(info[1]->Uint32Value());
+            CMd leftMat(refLeftData, rowsLeft, colsLeft);
+
+            if(info[5]->IsNumber()){
+                double rightParam(info[5]->NumberValue());
+
+				if (info[6]->IsFloat64Array()) {
+					double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
+                    Md res(refResData, rowsLeft, colsLeft);
+                    res = leftMat * rightParam;
+                    Local<Boolean> b = Nan::New(true);
+                    info.GetReturnValue().Set(b);
+                }
+            }
+            else{
+                //Local<Object> rightBuffer = info[5].As<Object>();
+				if (info[5]->IsFloat64Array()) {
+					double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
+                	size_t rowsRight(info[3]->Uint32Value());
+                    size_t colsRight(info[4]->Uint32Value());
+                    CMd rightMat(refRightData, rowsRight, colsRight);
+
+                    //Local<Object> resBuffer = info[6].As<Object>();
+					if (info[6]->IsFloat64Array()) {
+						double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
+                        Md res(refResData, rowsLeft, rowsRight);
+
+                        res = (rightMat * leftMat.transpose()).transpose();
+
+                        Local<Boolean> b = Nan::New(true);
+                        info.GetReturnValue().Set(b);
+                    }
+                }
+            }
+	    }
+	    else{
+	        Nan::ThrowTypeError("Wrong type of the first argument");
+            return;
+	    }
+
+	    Local<Boolean> b = Nan::New(false);
+        info.GetReturnValue().Set(b);
+	}
+}
+
+/**
+  *  Outer:
+  *  Outer product of two arrays.
+  *
+  *
+  *  arguments:
+  *  info[0]: Number represent the number of rows of the left matrix.
+  *  info[1]: Number represent the number of columns of the left matrix.
+  *  info[2]: Buffer(object created by smalloc) represent the left numjs.Matrix object .
+  *  info[3]: Number represent the number of rows of the right matrix.
+  *  info[4]: Number represent the number of columns of the right matrix.
+  *  info[5]: Buffer(object created by smalloc) represent the right numjs.Matrix object .
+  *  info[6]: Buffer(object created by smalloc) for return value.
+*/
+void Outer(const Nan::FunctionCallbackInfo<v8::Value>& info){
+    using CMd = Eigen::Map <const Eigen::MatrixXd >;
+    using Md = Eigen::Map <Eigen::MatrixXd >;
+
+	if (info.Length() < 7) {
+		Nan::ThrowTypeError("Wrong number of arguments");
+		return;
+	}
+    if (!info[0]->IsUint32() || !info[1]->IsUint32() ||
+    	!info[3]->IsUint32() || !info[4]->IsUint32()) {
+    	Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+	if (info[2]->IsNumber()) {
+	    double leftParam(info[2]->NumberValue());
+
+	    if(!info[5]->IsNumber()){
+			if (info[5]->IsFloat64Array()) {
+				double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
+                size_t rowsRight(info[3]->Uint32Value());
+                size_t colsRight(info[4]->Uint32Value());
+                CMd rightMat(refRightData, rowsRight, colsRight);
+
+				if (info[6]->IsFloat64Array()) {
+					double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
+                    Md res(refResData, rowsRight, colsRight);
+                    res = leftParam * rightMat;
+
+                    Local<Boolean> b = Nan::New(true);
+                    info.GetReturnValue().Set(b);
+                }
+            }
+        }
+
+    }
+	else{
+		if (info[2]->IsFloat64Array()) {
+			double *refLeftData = *(Nan::TypedArrayContents<double>(info[2]));
+	        size_t rowsLeft(info[0]->Uint32Value());
+            size_t colsLeft(info[1]->Uint32Value());
+            CMd leftMat(refLeftData, rowsLeft, colsLeft);
+
+            if(info[5]->IsNumber()){
+                double rightParam(info[5]->NumberValue());
+
+				if (info[6]->IsFloat64Array()) {
+					double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
+                    Md res(refResData, rowsLeft, colsLeft);
+                    res = leftMat * rightParam;
+                    Local<Boolean> b = Nan::New(true);
+                    info.GetReturnValue().Set(b);
+                }
+            }
+            else{
+                //Local<Object> rightBuffer = info[5].As<Object>();
+				if (info[5]->IsFloat64Array()) {
+					double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
+                	size_t rowsRight(info[3]->Uint32Value());
+                    size_t colsRight(info[4]->Uint32Value());
+                    CMd rightMat(refRightData, rowsRight, colsRight);
+
+                    //Local<Object> resBuffer = info[6].As<Object>();
+					if (info[6]->IsFloat64Array()) {
+						double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
+                        Md res(refResData, rowsLeft, colsRight);
+
+                        res = leftMat * rightMat;
+
+                        Local<Boolean> b = Nan::New(true);
+                        info.GetReturnValue().Set(b);
+                    }
+                }
+            }
+	    }
+	    else{
+	        Nan::ThrowTypeError("Wrong type of the first argument");
+            return;
+	    }
+
+	    Local<Boolean> b = Nan::New(false);
+        info.GetReturnValue().Set(b);
+	}
+}
+
+/**
+  *  Cholesky:
+  *  Return the Cholesky decomposition, L * L.H, of the square matrix a,
+  *  where L is lower-triangular and .H is the conjugate transpose operator
+  *  (which is the ordinary transpose if a is real-valued). a must be Hermitian
+  *  (symmetric if real-valued) and positive-definite. Only L is actually returned.
+  *
+  *  arguments:
+  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *           Must be square, i.e. M.rows == M.cols.
+  *  info[1]: Number represent the number of rows of the matrix.
+  *  info[2]: Number represent the number of columns of the matrix.
+  *  info[3]: Buffer(object created by smalloc) for return value, inverse of the given matrix.
+*/
+void Cholesky(const Nan::FunctionCallbackInfo<v8::Value>& info){
+    using CMd = Eigen::Map <const Eigen::MatrixXd >;
+    using Md = Eigen::Map <Eigen::MatrixXd >;
+
+    if (info.Length() < 4) {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
+        Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
+        size_t rowsMatrix(info[1]->Uint32Value());
+        size_t colsMatrix(info[2]->Uint32Value());
+
+        Md inputMat(refMatrixData, rowsMatrix, colsMatrix);
+
+		if (info[3]->IsFloat64Array()) {
+			double *refResData = *(Nan::TypedArrayContents<double>(info[3]));
+            Md res(refResData, rowsMatrix, colsMatrix);
+            res = inputMat.llt().matrixL();
+            Local<Boolean> b = Nan::New(true);
+            info.GetReturnValue().Set(b);
+        }
+        else{
+            Nan::ThrowTypeError("Wrong arguments (4th arg)");
+            Local<Boolean> b = Nan::New(false);
+            info.GetReturnValue().Set(b);
+        }
+    }
+    else{
+        Nan::ThrowTypeError("Wrong arguments (1st arg)");
+        Local<Boolean> b = Nan::New(false);
+        info.GetReturnValue().Set(b);
+    }
+}
+
+/**
   *  Identity:
   *  Creates a new identity matrix - a square nXn matrix with ones on the diagonal
   *  and zeros elsewhere
@@ -567,6 +822,105 @@ void Det(const Nan::FunctionCallbackInfo<v8::Value>& info){
 }
 
 /**
+  *  SVD:
+  *  Singular Value Decomposition.
+  *  Factors the matrix a as u * np.diag(s) * v, where u and v are unitary and s is a 1-d array of a‘s singular values.
+  *
+  *  arguments:
+  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *           Must be square, i.e. M.rows == M.cols.
+  *  info[1]: Number represent the number of rows of the matrix.
+  *  info[2]: Number represent the number of columns of the matrix.
+  *  info[3]: full_matrices(bool, optional): If True (default), u and v have the shapes (M, M) and (N, N), respectively.
+  *           Otherwise, the shapes are (M, K) and (K, N), respectively, where K = min(M, N).
+  *  info[4]: compute_uv (bool, optional): Whether or not to compute u and v in addition to s. True by default.
+  *  info[5]: outU - Unitary matrices. The actual shape depends on the value of full_matrices.
+  *                  Only returned when compute_uv is True.
+  *  info[6]: outS - The singular values for every matrix, sorted in descending order.
+  *  info[7]: outV - Unitary matrices. The actual shape depends on the value of full_matrices.
+  *                  Only returned when compute_uv is True.
+*/
+void SVD(const Nan::FunctionCallbackInfo<v8::Value>& info){
+    using CMd = Eigen::Map <const Eigen::MatrixXd >;
+    using Md = Eigen::Map <Eigen::MatrixXd >;
+
+    if (info.Length() < 8) {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
+        Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+	if (info[0]->IsFloat64Array()) {
+		double *refMatrixData = *(Nan::TypedArrayContents<double>(info[0]));
+        int rowsMatrix(info[1]->Uint32Value());
+        int colsMatrix(info[2]->Uint32Value());
+
+        Md inputMat(refMatrixData, rowsMatrix, colsMatrix);
+
+        bool isFullMatrices = info[3]->BooleanValue();
+        bool isComputeUV = info[4]->BooleanValue();
+        int k = min(rowsMatrix,colsMatrix);
+
+        if(isComputeUV){
+            if (info[5]->IsFloat64Array() && info[6]->IsFloat64Array() && info[7]->IsFloat64Array()) {
+
+                double *refResU = *(Nan::TypedArrayContents<double>(info[5]));
+                double *refResS = *(Nan::TypedArrayContents<double>(info[6]));
+                double *refResV = *(Nan::TypedArrayContents<double>(info[7]));
+
+                if(isFullMatrices){
+                    Eigen::JacobiSVD<Eigen::MatrixXd> svd(inputMat, Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+                    Md resU(refResU, rowsMatrix, rowsMatrix);
+                    Md resV(refResV, colsMatrix, colsMatrix);
+
+                    resU = svd.matrixU();
+                    resV = svd.matrixV();
+
+                    std::memcpy(refResS, svd.singularValues().data(), k * sizeof(double));
+
+                    Local<Boolean> b = Nan::New(true);
+                    info.GetReturnValue().Set(b);
+                }
+                else{
+                    Eigen::JacobiSVD<Eigen::MatrixXd> svd(inputMat, Eigen::ComputeThinU | Eigen::ComputeThinV);
+
+                    Md resU(refResU, rowsMatrix, k);
+                    Md resV(refResV, k, colsMatrix);
+
+                    resU = svd.matrixU();
+                    resV = svd.matrixV();
+
+                    std::memcpy(refResS, svd.singularValues().data(), k * sizeof(double));
+
+                    Local<Boolean> b = Nan::New(true);
+                    info.GetReturnValue().Set(b);
+                }
+            }
+        }
+        else{
+            if(info[6]->IsFloat64Array()){
+                double *refResS = *(Nan::TypedArrayContents<double>(info[6]));
+                Eigen::JacobiSVD<Eigen::MatrixXd> svd(inputMat);
+                std::memcpy(refResS, svd.singularValues().data(), k * sizeof(double));
+
+                Local<Boolean> b = Nan::New(true);
+                info.GetReturnValue().Set(b);
+            }
+        }
+    }
+    else{
+        Nan::ThrowTypeError("Wrong arguments");
+        Local<Boolean> b = Nan::New(false);
+        info.GetReturnValue().Set(b);
+    }
+}
+
+/**
   *  Rank:
   *  Return matrix rank of array using SVD method
   *  Rank of the array is the number of SVD singular values of the array that are greater than threshold(info[3]).
@@ -740,6 +1094,10 @@ NAN_METHOD(MatMul){
 
 void Init(v8::Local<v8::Object> exports) {
 	exports->Set(Nan::New("dot").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Dot)->GetFunction());
+	exports->Set(Nan::New("inner").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Inner)->GetFunction());
+	exports->Set(Nan::New("outer").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Outer)->GetFunction());
+	exports->Set(Nan::New("cholesky").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Cholesky)->GetFunction());
+	exports->Set(Nan::New("svd").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(SVD)->GetFunction());
 	exports->Set(Nan::New("matrix_power").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(MatrixPower)->GetFunction());
 	exports->Set(Nan::New("eye").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Eye)->GetFunction());
 	exports->Set(Nan::New("identity").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(Identity)->GetFunction());

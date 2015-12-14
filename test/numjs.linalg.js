@@ -54,6 +54,134 @@ describe('numjs.linalg - native extension to support linear algebra via the Eige
         })
     })
 
+    describe('inner', function () {
+        it('should return the product of two numbers', function () {
+            assert.equal(linalg.inner(7, 3), 21);
+        })
+
+        it('should return the product of number and vector', function () {
+            var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 4, 1);
+            var matrix = linalg.inner(3, jsMatRight);
+            expect(matrix).to.have.property('rows').equal(4);
+            expect(matrix).to.have.property('cols').equal(1);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(6);
+            expect(matrix.data["1"]).to.equal(6);
+            expect(matrix.data["2"]).to.equal(3);
+            expect(matrix.data["3"]).to.equal(3);
+        })
+
+        it('should return the product of number and 2-D array', function () {
+            var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 2, 2);
+            var matrix = linalg.inner(2, jsMatRight);
+            expect(matrix).to.have.property('rows').equal(2);
+            expect(matrix).to.have.property('cols').equal(2);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(4);
+            expect(matrix.data["1"]).to.equal(4);
+            expect(matrix.data["2"]).to.equal(2);
+            expect(matrix.data["3"]).to.equal(2);
+        })
+
+        it('should return the inner product of two 1-D matrices', function () {
+            var jsMatLeft = new linalg.Matrix([1, 1, 1, 1], 1, 4);
+            var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 1, 4);
+            assert.equal(linalg.inner(jsMatLeft, jsMatRight), 6);
+        })
+
+        it('should return the sum product over the second axes of two 2-D matrices', function () {
+            var jsMatLeft = new linalg.Matrix([1, 4, 2, 5, 3, 6], 2, 3);
+            var jsMatRight = new linalg.Matrix([7, 10,8, 11,9, 12], 2, 3);
+            var matrix = linalg.inner(jsMatLeft, jsMatRight);
+            expect(matrix).to.have.property('rows').equal(2);
+            expect(matrix).to.have.property('cols').equal(2);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(50);
+            expect(matrix.data["1"]).to.equal(122);
+            expect(matrix.data["2"]).to.equal(68);
+            expect(matrix.data["3"]).to.equal(167);
+        })
+
+        it('should return the sum product over the second axes of vector and 2-D arrays', function () {
+            var jsMatLeft = new linalg.Matrix([1, 2, 3], 1, 3);
+            var jsMatRight = new linalg.Matrix([1, 4, 2, 5, 3, 6], 2, 3);
+            var matrix = linalg.inner(jsMatLeft, jsMatRight);
+            expect(matrix.data.length).to.equal(2);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(14);
+            expect(matrix.data["1"]).to.equal(32);
+        })
+
+        it('should return the sum product over the second axes of 2-D arrays and vector', function () {
+            var jsMatLeft = new linalg.Matrix([1, 4, 2, 5, 3, 6], 2, 3);
+            var jsMatRight = new linalg.Matrix([1, 2, 3], 1, 3);
+            var matrix = linalg.inner(jsMatLeft, jsMatRight);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data.length).to.equal(2);
+            expect(matrix.data["0"]).to.equal(14);
+            expect(matrix.data["1"]).to.equal(32);
+        })
+    })
+
+    describe('outer', function () {
+        it('should return the product of two numbers', function () {
+            assert.equal(linalg.outer(7, 3), 21);
+        })
+
+        it('should return the product of number and vector', function () {
+            var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 4, 1);
+            var matrix = linalg.outer(3, jsMatRight);
+            expect(matrix).to.have.property('rows').equal(4);
+            expect(matrix).to.have.property('cols').equal(1);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(6);
+            expect(matrix.data["1"]).to.equal(6);
+            expect(matrix.data["2"]).to.equal(3);
+            expect(matrix.data["3"]).to.equal(3);
+        })
+
+        it('should return the product of number and 2-D array', function () {
+            var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 2, 2);
+            var matrix = linalg.outer(2, jsMatRight);
+            expect(matrix).to.have.property('rows').equal(2);
+            expect(matrix).to.have.property('cols').equal(2);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(4);
+            expect(matrix.data["1"]).to.equal(4);
+            expect(matrix.data["2"]).to.equal(2);
+            expect(matrix.data["3"]).to.equal(2);
+        })
+
+        it('should return the outer product of two vectors', function () {
+            var jsMatLeft = new linalg.Matrix([1, 1, 1, 1], 1, 4);
+            var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 1, 4);
+            var matrix = linalg.outer(jsMatLeft, jsMatRight);
+            expect(matrix).to.have.property('rows').equal(4);
+            expect(matrix).to.have.property('cols').equal(4);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(2);
+            expect(matrix.data["1"]).to.equal(2);
+            expect(matrix.data["2"]).to.equal(2);
+            expect(matrix.data["3"]).to.equal(2);
+
+            expect(matrix.data["4"]).to.equal(2);
+            expect(matrix.data["5"]).to.equal(2);
+            expect(matrix.data["6"]).to.equal(2);
+            expect(matrix.data["7"]).to.equal(2);
+
+            expect(matrix.data["8"]).to.equal(1);
+            expect(matrix.data["9"]).to.equal(1);
+            expect(matrix.data["10"]).to.equal(1);
+            expect(matrix.data["11"]).to.equal(1);
+
+            expect(matrix.data["12"]).to.equal(1);
+            expect(matrix.data["13"]).to.equal(1);
+            expect(matrix.data["14"]).to.equal(1);
+            expect(matrix.data["15"]).to.equal(1);
+
+        })
+    })
+
     describe("identity", function() {
         it ("should create a 2x2 identity matrix", function() {
             var output = linalg.identity(2);
@@ -709,6 +837,116 @@ describe('numjs.linalg - native extension to support linear algebra via the Eige
             var jsMat = new linalg.Matrix([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0.3], 4, 4);
             var rank = linalg.matrix_rank(jsMat, 0.3);
             expect(rank).to.equal(3);
+        })
+    })
+
+    describe('cholesky', function () {
+        it('should return the lower-triangular Cholesky factor of a matrix [[4, -1, 2],[-1, 6, 0],[2, 0, 5]]', function () {
+            var jsMat = new linalg.Matrix([4, -1, 2, -1, 6, 0, 2, 0, 5], 3, 3);
+            var matrix = linalg.cholesky(jsMat);
+            expect(matrix).to.have.property('rows').equal(3);
+            expect(matrix).to.have.property('cols').equal(3);
+            expect(matrix).to.have.property('data');
+            expect(matrix.data["0"]).to.equal(2);
+            expect(matrix.data["1"]).to.equal(-0.5);
+            expect(matrix.data["2"]).to.equal(1);
+
+            expect(matrix.data["3"]).to.equal(0);
+            expect(matrix.data["4"]).to.be.within(2.39, 2.4);
+            expect(matrix.data["5"]).to.be.within(0.208, 0.209);
+
+            expect(matrix.data["6"]).to.equal(0);
+            expect(matrix.data["7"]).to.equal(0);
+            expect(matrix.data["8"]).to.be.within(1.98, 1.99);
+
+        })
+    })
+
+    describe('svd', function () {
+        it('should return u, s, v as full matrices, when sending the matrix =[[0.68, 0.597], [-0.211, 0.823], [0.566, -0.605]]', function () {
+            var jsMat = new linalg.Matrix([0.68, -0.211, 0.566, 0.597, 0.823, -0.605], 3, 2);
+            var svdObj = linalg.svd(jsMat);
+            expect(svdObj).to.have.property('u');
+            expect(svdObj).to.have.property('s');
+            expect(svdObj).to.have.property('v');
+
+            // check u
+            expect(svdObj.u.data["0"]).to.be.within(0.38, 0.389);
+            expect(svdObj.u.data["1"]).to.be.within(0.71, 0.713);
+            expect(svdObj.u.data["2"]).to.be.within(-0.59, -0.58);
+
+            expect(svdObj.u.data["3"]).to.be.within(0.86, 0.87);
+            expect(svdObj.u.data["4"]).to.be.within(-0.07, -0.06);
+            expect(svdObj.u.data["5"]).to.be.within(0.49, 0.498);
+
+            expect(svdObj.u.data["6"]).to.be.within(-0.34, -0.3);
+            expect(svdObj.u.data["7"]).to.be.within(0.6, 0.7);
+            expect(svdObj.u.data["8"]).to.be.within(0.64, 0.65);
+
+            // check s
+            expect(svdObj.s["0"]).to.be.within(1.19, 1.2);
+            expect(svdObj.s["1"]).to.be.within(0.89, 0.899);
+
+            //check v
+            expect(svdObj.v.data["0"]).to.be.within(-0.19, -0.18);
+            expect(svdObj.v.data["1"]).to.be.within(0.98, 0.99);
+
+            expect(svdObj.v.data["2"]).to.be.within(0.98, 0.99);
+            expect(svdObj.v.data["3"]).to.be.within(0.18, 0.19);
+        })
+
+        it('should return u, s, v as thin matrices, when sending the matrix =[[0.68, 0.597], [-0.211, 0.823], [0.566, -0.605]]', function () {
+            var jsMat = new linalg.Matrix([0.68, -0.211, 0.566, 0.597, 0.823, -0.605], 3, 2);
+            var svdObj = linalg.svd(jsMat, false);
+            expect(svdObj).to.have.property('u');
+            expect(svdObj).to.have.property('s');
+            expect(svdObj).to.have.property('v');
+
+            // check u
+            expect(svdObj.u.data["0"]).to.be.within(0.38, 0.389);
+            expect(svdObj.u.data["1"]).to.be.within(0.71, 0.713);
+            expect(svdObj.u.data["2"]).to.be.within(-0.59, -0.58);
+
+            expect(svdObj.u.data["3"]).to.be.within(0.86, 0.87);
+            expect(svdObj.u.data["4"]).to.be.within(-0.07, -0.06);
+            expect(svdObj.u.data["5"]).to.be.within(0.49, 0.498);
+
+            // check u is thin
+            expect(svdObj.u.rows).to.equal(3);
+            expect(svdObj.u.cols).to.equal(2);
+
+            // check s
+            expect(svdObj.s["0"]).to.be.within(1.19, 1.2);
+            expect(svdObj.s["1"]).to.be.within(0.89, 0.899);
+
+            //check v
+            expect(svdObj.v.data["0"]).to.be.within(-0.19, -0.18);
+            expect(svdObj.v.data["1"]).to.be.within(0.98, 0.99);
+
+            expect(svdObj.v.data["2"]).to.be.within(0.98, 0.99);
+            expect(svdObj.v.data["3"]).to.be.within(0.18, 0.19);
+
+            // check v is thin
+            expect(svdObj.v.rows).to.equal(2);
+            expect(svdObj.v.cols).to.equal(2);
+        })
+
+        it('should return only s, when sending the matrix =[[0.68, 0.597], [-0.211, 0.823], [0.566, -0.605]]', function () {
+            var jsMat = new linalg.Matrix([0.68, -0.211, 0.566, 0.597, 0.823, -0.605], 3, 2);
+            var svdObj = linalg.svd(jsMat, false, false);
+            expect(svdObj).to.have.property('u');
+            expect(svdObj).to.have.property('s');
+            expect(svdObj).to.have.property('v');
+
+            // check u
+            expect(svdObj.u).to.be.null;
+
+            // check s
+            expect(svdObj.s["0"]).to.be.within(1.19, 1.2);
+            expect(svdObj.s["1"]).to.be.within(0.89, 0.899);
+
+            //check v
+            expect(svdObj.v).to.be.null;
         })
     })
 

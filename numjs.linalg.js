@@ -207,6 +207,168 @@ var numjs_linalg = {
     },
 
     /**
+     * Computes the ordinary inner product of vectors for 1-D matrices, or in 2 dimensions, computes the sum product
+     * over the last axes. (i.e. sum of left.row[i] * right.row[j])
+     * If a or b are scalars, computes a*b.
+     * NOTE: If a and b are nonscalar, their last dimensions of must match. (i.e. the number of cols)
+     * ==================
+     * usage example:
+     * Compute the sum product over the second axes of two 2-D matrices
+     * var jsMatLeft = new linalg.Matrix([1, 4, 2, 5, 3, 6], 2, 3); <- creates a new 2x3 matrix
+     * var jsMatRight = new linalg.Matrix([7, 10,8, 11,9, 12], 2, 3); <- creates a new 2x3 matrix
+     * var matrix = linalg.inner(jsMatLeft, jsMatRight); compute the sum product over the second axes
+     *
+     * Compute the inner product of two 1-D matrices
+     * var jsMatLeft = new linalg.Matrix([1, 1, 1, 1], 1, 4); <- creates a new 1x4 matrix (vector)
+     * var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 1, 4); <- creates a new 1x4 matrix (vector)
+     * var innerProduct = linalg.inner(2, jsMatRight); <- computes the inner product of the matrices
+     * ==================
+     *
+     * @param leftMatrix - The left input matrix to perform inner/sum product computation
+     * @param rightMatrix - The right input matrix to perform inner/sum product computation
+     * @param out - The inner/sum product of two input matrices
+     */
+    inner: function (leftMatrix, rightMatrix) {
+        var lrows = 1, lcols = 1, rrows = 1, rcols = 1, newRows, newCols, out;
+
+        if (!leftMatrix || !rightMatrix) {
+            throw new Error("The input parameters are undefined");
+        }
+
+        // In case left matrix and right matrix are both scalars
+        if (!isNaN(leftMatrix) && !isNaN(rightMatrix)) {
+            return leftMatrix * rightMatrix;
+        }
+
+        if (leftMatrix instanceof numjs_linalg.Matrix) {
+            lrows = leftMatrix.rows;
+            lcols = leftMatrix.cols;
+        }
+        else if (isNaN(leftMatrix)) {
+            throw new Error("The leftMatrix parameter is not instance of Matrix or a number");
+        }
+
+        if (rightMatrix instanceof numjs_linalg.Matrix) {
+            rrows = rightMatrix.rows;
+            rcols = rightMatrix.cols;
+        }
+        else if (isNaN(rightMatrix)) {
+            throw new Error("The rightMatrix parameter is not instance of Matrix or a number");
+        }
+
+        if(isNaN(leftMatrix) && isNaN(rightMatrix) && rightMatrix.cols !== leftMatrix.cols){
+            throw new Error("The last dimensions of left and right matrices must match");
+        }
+
+        newRows = lrows;
+        newCols = rrows;
+
+        // In case left matrix is scalar
+        if (!isNaN(leftMatrix) && isNaN(rightMatrix)) {// scalar*mat
+            newRows = rrows;
+            newCols = rcols;
+        }
+        // In case right matrix is scalar
+        else if (!isNaN(leftMatrix) && isNaN(rightMatrix)) {// mat*scalar
+            newRows = lrows;
+            newCols = lcols;
+        }
+
+        // Create new matrix for the results
+        out = new numjs_linalg.Matrix([], newRows, newCols);
+
+        var isSuc = linalg.inner(lrows, lcols, leftMatrix.data ? leftMatrix.data : leftMatrix,
+            rrows, rcols, rightMatrix.data ? rightMatrix.data : rightMatrix, out.data);
+
+        if (out.rows * out.cols === 1) {
+            return out.data[0];
+        }
+
+        return out;
+    },
+
+    /**
+     * Compute the outer product of two 1-D matrices. (i.e. out[i, j] = a[i] * b[j])
+     * If a or b are scalars, computes a*b.
+     * ==================
+     * usage example:
+     * var jsMatLeft = new linalg.Matrix([1, 1, 1, 1], 1, 4); <- creates a new 1x4 matrix (vector)
+     * var jsMatRight = new linalg.Matrix([2, 2, 1, 1], 1, 4); <- creates a new 1x4 matrix (vector)
+     * var matrix = linalg.outer(jsMatLeft, jsMatRight); <- computes the outer product of the two matrices
+     * ==================
+     *
+     * @param leftVector - The left input 1-D matrix to perform outer product computation.
+     *                      Input is flattened if not already 1-dimensional.
+     * @param rightVector - The right input 1-D matrix to perform outer product computation.
+     *                      Input is flattened if not already 1-dimensional.
+     * @return The ordinary outer product of two vectors.
+     */
+    outer: function (leftVector, rightVector, out) {
+        var lrows = 1, lcols = 1, rrows = 1, rcols = 1, newRows, newCols;
+
+        if (!leftVector || !rightVector) {
+            throw new Error("The input parameters are undefined");
+        }
+
+        // In case left matrix and right matrix are both scalars
+        if (!isNaN(leftVector) && !isNaN(rightVector)) {
+            return leftVector * rightVector;
+        }
+
+        if (leftVector instanceof numjs_linalg.Matrix) {
+            lrows = leftVector.rows * leftVector.cols;
+            lcols = 1;
+        }
+        else if (isNaN(leftVector)) {
+            throw new Error("The leftMatrix parameter is not instance of Matrix or a number");
+        }
+
+        if (rightVector instanceof numjs_linalg.Matrix) {
+            if (leftVector instanceof numjs_linalg.Matrix){
+                rrows = 1;
+                rcols = rightVector.rows * rightVector.cols;
+            }
+            else {
+                rrows = rightVector.rows;
+                rcols = rightVector.cols;
+            }
+        }
+        else if (isNaN(rightVector)) {
+            throw new Error("The rightMatrix parameter is not instance of Matrix or a number");
+        }
+
+        if (!out) {
+            newRows = lrows;
+            newCols = rcols;
+
+            // In case left matrix is scalar
+            if (!isNaN(leftVector) && isNaN(rightVector)) {// scalar*mat
+                newRows = rrows;
+                newCols = rcols;
+            }
+            // In case right matrix is scalar
+            else if (!isNaN(leftVector) && isNaN(rightVector)) {// mat*scalar
+                newRows = lrows;
+                newCols = lcols;
+            }
+
+            out = new numjs_linalg.Matrix([], newRows, newCols);
+        }
+        else if (!out instanceof numjs_linalg.Matrix) {
+            throw new Error("The out parameter is not instance of Matrix");
+        }
+
+        var isSuc = linalg.outer(lrows, lcols, leftVector.data ? leftVector.data : leftVector,
+            rrows, rcols, rightVector.data ? rightVector.data : rightVector, out.data);
+
+        if (out.rows * out.cols === 1) {
+            return out.data[0];
+        }
+
+        return out;
+    },
+
+    /**
      * Creates a square nXn identity matrix - a matrix with ones on the main diagonal
      * and zeros elsewhere.
      * =====================
@@ -381,6 +543,35 @@ var numjs_linalg = {
     },
 
     /**
+     * Cholesky decomposition.
+     *
+     * Return the Cholesky decomposition, L * L.H, of the square matrix a, where L is lower-triangular
+     * and .H is the conjugate transpose operator (which is the ordinary transpose if a is real-valued).
+     * a must be Hermitian (symmetric if real-valued) and positive-definite. Only L is actually returned.
+     * =================
+     * usage example:
+     * var jsMat = new linalg.Matrix([4, -1, 2, -1, 6, 0, 2, 0, 5], 3, 3); <- create a 3x3 Hermitian and positive-definite matrix
+     * var matrix = linalg.cholesky(jsMat); <-  return the lower-triangular Cholesky factor of jsMat
+     * =================
+     *
+     * @param matrix - the input matrix. Must be Hermitian (symmetric if all elements are real), positive-definite input matrix.
+     * @return The lower-triangular Cholesky factor of a. Returns a matrix object if a is a matrix object.
+     */
+    cholesky: function (matrix) {
+        if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
+            throw new Error("The first arg must be instanceof numjs.Matrix");
+        }
+
+        if (matrix.rows !== matrix.cols) {
+            throw new Error("matrix must be square, i.e. M.rows == M.cols");
+        }
+
+        var out = new numjs_linalg.Matrix([], matrix.rows, matrix.cols);
+        linalg.cholesky(matrix.data, matrix.rows, matrix.cols, out.data);
+        return out;
+    },
+
+    /**
      * Computes The sum along the diagonals of a matrix
      * =================
      * usage example:
@@ -396,6 +587,63 @@ var numjs_linalg = {
         }
 
         return linalg.trace(matrix.data, matrix.rows, matrix.cols);
+    },
+
+    /**
+     * Singular Value Decomposition.
+     * Factors the matrix a as u * np.diag(s) * v, where u and v are unitary and s is a 1-d array of a‘s singular values.
+     * =================
+     * usage example:
+     * var jsMat = new linalg.Matrix([0.68, -0.211, 0.566, 0.597, 0.823, -0.605], 3, 2); <- create a new 3X2 matrix
+     * var svdObj = linalg.svd(jsMat, false, false); <- compute the Singular Value Decomposition (just s)
+     * or:
+     * var svdObj = linalg.svd(jsMat, false); <- compute the Singular Value Decomposition (just u,s,v, when u and v are thin)
+     * or:
+     * var svdObj = linalg.svd(jsMat); <- compute the Singular Value Decomposition (just u,s,v, when u and v are full)
+     * =================
+     *
+     * @param matrix - A real matrix of shape (M, N).
+     * @param full_matrices - bool, optional - If True (default), u and v have the shapes (M, M) and (N, N),
+     *                        respectively. Otherwise, the shapes are (M, K) and (K, N), respectively, where K = min(M, N).
+     * @param compute_uv - bool, optional - Whether or not to compute u and v in addition to s. True by default.
+     * @returns object contains u, s, v:
+     *          u : Unitary matrices. The actual shape depends on the value of full_matrices.
+     *              Only returned when compute_uv is True.
+     *          s:  The singular values for every matrix, sorted in descending order (a Float64Array).
+     *          v: Unitary matrices. The actual shape depends on the value of full_matrices.
+     *          Only returned when compute_uv is True.
+     */
+    svd: function (matrix, full_matrices, compute_uv) {
+        var outU = null, outS=null, outV=null, k=1;
+        if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
+            throw new Error("The first arg must be instanceof numjs.Matrix");
+        }
+
+        if(full_matrices === undefined || full_matrices === null){
+            full_matrices = true;
+        }
+        if(compute_uv === undefined || compute_uv === null){
+            compute_uv = true;
+        }
+
+        k = Math.min(matrix.rows, matrix.cols);
+        outS = new Float64Array(k);
+
+        if(compute_uv){
+            if(full_matrices){
+                outU = new numjs_linalg.Matrix([], matrix.rows, matrix.rows);
+                outV = new numjs_linalg.Matrix([], matrix.cols, matrix.cols);
+            }
+            else{
+                outU = new numjs_linalg.Matrix([], matrix.rows, k);
+                outV = new numjs_linalg.Matrix([], k, matrix.cols);
+            }
+        }
+
+        linalg.svd(matrix.data, matrix.rows, matrix.cols, full_matrices, compute_uv,
+                outU ? outU.data : outU, outS, outV ? outV.data : outV);
+
+        return {u: outU, s: outS, v: outV};
     },
 
     /**
