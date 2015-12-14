@@ -697,7 +697,18 @@ var numjs_linalg = {
         }
     },
 
-    matrix_eigen_values: function (matrix, tol) {
+    /**
+     * Solve linear equation system
+     * ========================
+     * usage example:
+     * var A = linalg.eye(3,3); <- create a 3x3 eye matrix
+     * var resMat = linalg.matrix_eigen_values(A); <- get the values of x in A*x=b system of equations
+     * ========================
+     *
+     * @param matrix - the matrix whos eigen values we wish to find
+     * @returns {Float64Array} such that every pair is the real and imaginary part of an eigen value.
+     */    
+    matrix_eigen_values: function (matrix) {
         if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
             throw new Error("The first arg must be instanceof numjs.Matrix");
         }
@@ -708,7 +719,20 @@ var numjs_linalg = {
         linalg.get_eigen_values(matrix.rows, matrix.cols, matrix.data, eigenTestResult);
         return eigenTestResult;
     },
-
+    
+    /**
+     * Solve linear equation system
+     * ========================
+     * usage example:
+     * var A = linalg.eye(3,3); <- create a 3x3 eye matrix
+     * var b = new Float64Array([1,2,3]); <- create the 
+     * var resMat = linalg.matrix_solve_linear(A, b); <- get the values of x in A*x=b system of equations
+     * ========================
+     *
+     * @param matrix - the matrix defining the coefficients  
+     * @param b - the constraint vector as a Float64Array in the 
+     * @returns {Float64Array} such every value is the x_i respective value.
+     */    
     matrix_solve_linear: function (matrix, b) {
         if (!matrix || !(matrix instanceof numjs_linalg.Matrix)) {
             throw new Error("The first arg must be instanceof numjs.Matrix");

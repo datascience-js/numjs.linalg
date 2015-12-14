@@ -14,11 +14,11 @@ using namespace v8;
   *  arguments:
   *  info[0]: Number represent the number of rows of the left matrix.
   *  info[1]: Number represent the number of columns of the left matrix.
-  *  info[2]: Buffer(object created by smalloc) represent the left numjs.Matrix object .
+  *  info[2]: Buffer(object created by Float64Array) represent the left numjs.Matrix object .
   *  info[3]: Number represent the number of rows of the right matrix.
   *  info[4]: Number represent the number of columns of the right matrix.
-  *  info[5]: Buffer(object created by smalloc) represent the right numjs.Matrix object .
-  *  info[6]: Buffer(object created by smalloc) for return value, which is the dot product of
+  *  info[5]: Buffer(object created by Float64Array) represent the right numjs.Matrix object .
+  *  info[6]: Buffer(object created by Float64Array) for return value, which is the dot product of
   *           left matrix and right matrix.
 */
 void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
@@ -76,14 +76,12 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
                 }
             }
             else{
-                //Local<Object> rightBuffer = info[5].As<Object>();
 				if (info[5]->IsFloat64Array()) {
 					double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
                 	size_t rowsRight(info[3]->Uint32Value());
                     size_t colsRight(info[4]->Uint32Value());
                     CMd rightMat(refRightData, rowsRight, colsRight);
 
-                    //Local<Object> resBuffer = info[6].As<Object>();
 					if (info[6]->IsFloat64Array()) {
 						double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
                         Md res(refResData, rowsLeft, colsRight);
@@ -114,11 +112,11 @@ void Dot(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  arguments:
   *  info[0]: Number represent the number of rows of the left matrix.
   *  info[1]: Number represent the number of columns of the left matrix.
-  *  info[2]: Buffer(object created by smalloc) represent the left numjs.Matrix object .
+  *  info[2]: Buffer(object created by Float64Array) represent the left numjs.Matrix object .
   *  info[3]: Number represent the number of rows of the right matrix.
   *  info[4]: Number represent the number of columns of the right matrix.
-  *  info[5]: Buffer(object created by smalloc) represent the right numjs.Matrix object .
-  *  info[6]: Buffer(object created by smalloc) for return value.
+  *  info[5]: Buffer(object created by Float64Array) represent the right numjs.Matrix object .
+  *  info[6]: Buffer(object created by Float64Array) for return value.
 */
 void Inner(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -175,14 +173,12 @@ void Inner(const Nan::FunctionCallbackInfo<v8::Value>& info){
                 }
             }
             else{
-                //Local<Object> rightBuffer = info[5].As<Object>();
 				if (info[5]->IsFloat64Array()) {
 					double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
                 	size_t rowsRight(info[3]->Uint32Value());
                     size_t colsRight(info[4]->Uint32Value());
                     CMd rightMat(refRightData, rowsRight, colsRight);
 
-                    //Local<Object> resBuffer = info[6].As<Object>();
 					if (info[6]->IsFloat64Array()) {
 						double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
                         Md res(refResData, rowsLeft, rowsRight);
@@ -213,11 +209,11 @@ void Inner(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  arguments:
   *  info[0]: Number represent the number of rows of the left matrix.
   *  info[1]: Number represent the number of columns of the left matrix.
-  *  info[2]: Buffer(object created by smalloc) represent the left numjs.Matrix object .
+  *  info[2]: Buffer(object created by Float64Array) represent the left numjs.Matrix object .
   *  info[3]: Number represent the number of rows of the right matrix.
   *  info[4]: Number represent the number of columns of the right matrix.
-  *  info[5]: Buffer(object created by smalloc) represent the right numjs.Matrix object .
-  *  info[6]: Buffer(object created by smalloc) for return value.
+  *  info[5]: Buffer(object created by Float64Array) represent the right numjs.Matrix object .
+  *  info[6]: Buffer(object created by Float64Array) for return value.
 */
 void Outer(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -274,14 +270,12 @@ void Outer(const Nan::FunctionCallbackInfo<v8::Value>& info){
                 }
             }
             else{
-                //Local<Object> rightBuffer = info[5].As<Object>();
 				if (info[5]->IsFloat64Array()) {
 					double *refRightData = *(Nan::TypedArrayContents<double>(info[5]));
                 	size_t rowsRight(info[3]->Uint32Value());
                     size_t colsRight(info[4]->Uint32Value());
                     CMd rightMat(refRightData, rowsRight, colsRight);
 
-                    //Local<Object> resBuffer = info[6].As<Object>();
 					if (info[6]->IsFloat64Array()) {
 						double *refResData = *(Nan::TypedArrayContents<double>(info[6]));
                         Md res(refResData, rowsLeft, colsRight);
@@ -312,11 +306,11 @@ void Outer(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  (symmetric if real-valued) and positive-definite. Only L is actually returned.
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be inverted.
   *           Must be square, i.e. M.rows == M.cols.
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
-  *  info[3]: Buffer(object created by smalloc) for return value, inverse of the given matrix.
+  *  info[3]: Buffer(object created by Float64Array) for return value, inverse of the given matrix.
 */
 void Cholesky(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -366,7 +360,7 @@ void Cholesky(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *
   *  arguments:
   *  info[0]: Number n which represents the matrix dimensions
-  *  info[2]: Buffer(object created by smalloc) for return value(identity matrix nXn).
+  *  info[2]: Buffer(object created by Float64Array) for return value(identity matrix nXn).
 */
 void Identity(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -409,7 +403,7 @@ void Identity(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  arguments:
   *  info[0]: Number n which represents the number of rows in the newly built matrix
   *  info[1]: Number m which represents the number of cols in the newly built matrix
-  *  info[2]: Buffer(object created by smalloc) for return value(eye matrix nXm).
+  *  info[2]: Buffer(object created by Float64Array) for return value(eye matrix nXm).
 */
 void Tri(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -457,7 +451,7 @@ void Tri(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  arguments:
   *  info[0]: Number n which represents the number of rows in the newly built matrix
   *  info[1]: Number m which represents the number of cols in the newly built matrix
-  *  info[2]: Buffer(object created by smalloc) for return value(eye matrix nXm).
+  *  info[2]: Buffer(object created by Float64Array) for return value(eye matrix nXm).
 */
 void Eye(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -497,10 +491,10 @@ void Eye(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Creates a copy of a given matrix with all elements above the diagonal zeroed
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be converted to lower diagonal matrix
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be converted to lower diagonal matrix
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
-  *  info[3]: Buffer(object created by smalloc) for return value(M**m).
+  *  info[3]: Buffer(object created by Float64Array) for return value(M**m).
 */
 void Tril(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -557,10 +551,10 @@ void Tril(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Creates a copy of a given matrix with all elements below the diagonal zeroed
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be converted to lower diagonal matrix
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be converted to lower diagonal matrix
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
-  *  info[3]: Buffer(object created by smalloc) for return value(M**m).
+  *  info[3]: Buffer(object created by Float64Array) for return value(M**m).
 */
 void Triu(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -617,12 +611,12 @@ void Triu(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Raise a square matrix to the (integer) power n.
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be "powered".
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be "powered".
   *           Must be square, i.e. M.rows == M.cols.
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
   *  info[3]: Number m represent the exponent. Can be any integer or long integer, positive, negative, or zero.
-  *  info[4]: Buffer(object created by smalloc) for return value(M**m).
+  *  info[4]: Buffer(object created by Float64Array) for return value(M**m).
               If the exponent is positive or zero then the type of the elements is the same as those of M.
               If the exponent is negative the elements are floating-point.
 */
@@ -689,11 +683,11 @@ void MatrixPower(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Given a square matrix a, return the matrix ainv satisfying dot(a, ainv) = dot(ainv, a)
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be inverted.
   *           Must be square, i.e. M.rows == M.cols.
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
-  *  info[3]: Buffer(object created by smalloc) for return value, inverse of the given matrix.
+  *  info[3]: Buffer(object created by Float64Array) for return value, inverse of the given matrix.
 */
 void Inverse(const Nan::FunctionCallbackInfo<v8::Value>& info){
     using CMd = Eigen::Map <const Eigen::MatrixXd >;
@@ -742,7 +736,7 @@ void Inverse(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Computes The sum along the diagonals of an array
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be inverted.
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
   *
@@ -784,7 +778,7 @@ void Trace(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Compute the determinant of an array.
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be inverted.
   *           Must be square, i.e. M.rows == M.cols.
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
@@ -827,7 +821,7 @@ void Det(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Factors the matrix a as u * np.diag(s) * v, where u and v are unitary and s is a 1-d array of a‘s singular values.
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be inverted.
   *           Must be square, i.e. M.rows == M.cols.
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
@@ -926,7 +920,7 @@ void SVD(const Nan::FunctionCallbackInfo<v8::Value>& info){
   *  Rank of the array is the number of SVD singular values of the array that are greater than threshold(info[3]).
   *
   *  arguments:
-  *  info[0]: Buffer(object created by smalloc) represent the numjs.Matrix object to be inverted.
+  *  info[0]: Buffer(object created by Float64Array) represent the numjs.Matrix object to be inverted.
   *           Must be square, i.e. M.rows == M.cols.
   *  info[1]: Number represent the number of rows of the matrix.
   *  info[2]: Number represent the number of columns of the matrix.
@@ -1047,20 +1041,33 @@ NAN_METHOD(SolveLinearSystemHouseholderQr){
 	info.GetReturnValue().Set(b);
 }
 
-
+/**
+  *  Matrix multiplication:
+  *  Given compatible matrices A,B returns A*B.
+  *  For 2-D arrays it is equivalent to matrix multiplication, and for 1-D arrays to inner product of vectors
+  * (without complex conjugation).
+  *
+  *  arguments:
+  *  info[0]: Number represent the number of rows of the left matrix.
+  *  info[1]: Number represent the number of columns of the left matrix.
+  *  info[2]: Buffer(object created by Float64Array) represent the left numjs.Matrix object .
+  *  info[3]: Number represent the number of rows of the right matrix.
+  *  info[4]: Number represent the number of columns of the right matrix.
+  *  info[5]: Buffer(object created by Float64Array) represent the right numjs.Matrix object .
+  *  info[6]: Buffer(object created by Float64Array) for return value, which is the dot product of
+  *           left matrix and right matrix.
+*/
 NAN_METHOD(MatMul){
 	using CMd = Eigen::Map <const Eigen::MatrixXd >;
 	using Md = Eigen::Map <Eigen::MatrixXd >;
-	//Map<MatrixXf> mf(pf, rows, columns);
 
 	if (info.Length() < 7) {
 		Nan::ThrowTypeError("Wrong number of arguments");
 		return;
 	}
 
-	if (!info[0]->IsUint32() || !info[1]->IsUint32() ||/* !args[2]->IsFloat32Array() ||*/
-		!info[3]->IsUint32() || !info[4]->IsUint32()   /*||  !args[5]->IsFloat32Array() ||
-													   !args[6]->IsFloat32Array()*/) {
+	if (!info[0]->IsUint32() || !info[1]->IsUint32() ||
+		!info[3]->IsUint32() || !info[4]->IsUint32() ) {
 		Nan::ThrowTypeError("Wrong arguments");
 		return;
 	}
