@@ -6,6 +6,8 @@ A nodejs addon that enables to harness the power of [Eigen](http://eigen.tuxfami
 
 ## Setup
 
+This library is dependant on [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). Therefore it requires that the a folder contatining an Eigen library will be pressent in the directory above it (currently builds against and requires: eigen-eigen-10219c95fe65).
+
 To setup the addon after pulling run
 
 ```text
